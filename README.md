@@ -1,2 +1,2 @@
  ## IDPA-Hauptprojekt
- Güterrechtliche und Erbrechtliche Auseinandersetzungen
+Erbe- und Rechts-Berechnungs Organisator
