@@ -1,3 +1,144 @@
+:root {
+    --text-color: #120f0c;
+    --background-color: #fcfafa;
+    --primary-color: #be754e; /* Primäre Farbe für Rahmen und Akzente */
+    --secondary-color: #f38950; /* Sekundäre Farbe für den aktiven Tab */
+    --accent-color: #ffc43b; /* Akzentfarbe (hier nicht primär verwendet, aber definiert) */
+    --border-style: 1px solid var(--text-color);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    width: 900px; /* Definierte Breite für das Mockup-Fenster */
+    border: var(--border-style);
+    background-color: #fff; /* Innenbereich etwas heller */
+}
+
+/* --- Header und Titelbereich --- */
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: var(--border-style);
+    padding: 10px 0; /* Padding oben/unten */
+    margin: 0 10px; /* Abstand zu den Seiten, damit die Pfeile außen sind */
+}
+
+.title-container {
+    text-align: center;
+    flex-grow: 1; /* Nimmt den meisten Platz ein */
+}
+
+.mockup-label {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-bottom: 5px;
+}
+
+.main-title {
+    font-size: 1.2em;
+    margin: 0;
+    padding: 5px 20px;
+    border: var(--border-style);
+    display: inline-block; /* Passt sich der Textlänge an */
+}
+
+.arrow {
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    margin: 0 5px;
+}
+
+.left-arrow {
+    border-right: 15px solid var(--primary-color);
+}
+
+.right-arrow {
+    border-left: 15px solid var(--primary-color);
+}
+
+/* --- Navigationsleiste (Tabs) --- */
+
+.tabs-nav {
+    display: flex;
+    border-bottom: var(--border-style);
+}
+
+.tab-button {
+    flex-grow: 1; /* Gleiche Breite für alle Buttons */
+    padding: 10px 0;
+    border: none;
+    border-right: var(--border-style);
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tab-button:last-child {
+    border-right: none;
+}
+
+/* Aktiver Tab */
+.tab-button.active {
+    background-color: var(--secondary-color); /* Sekundäre Farbe */
+    color: #fff;
+    border-color: var(--secondary-color);
+    /* Umrandung des aktiven Tabs wie im Mockup */
+    border-top: var(--border-style);
+    border-left: var(--border-style);
+    border-right: var(--border-style);
+    border-bottom: none; /* Wichtig: Untere Linie fehlt */
+    margin-bottom: -1px; /* Überlappt die untere Linie leicht */
+    z-index: 1; /* Überlagert die untere Linie */
+}
+
+/* --- Hauptinhaltsbereich --- */
+
+.content-area {
+    display: flex;
+    padding: 20px;
+}
+
+.left-panel, .right-panel {
+    min-height: 400px; /* Beispielhöhe */
+    border: var(--border-style);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.left-panel {
+    flex: 2; /* Nimmt mehr Platz ein (Verhältnis ca. 2:1) */
+    margin-right: 20px;
+}
+
+.right-panel {
+    flex: 1;
+}
+
+.panel-label {
+    font-size: 1.5em;
+    color: var(--text-color);
+    opacity: 0.6;
+}
 * {
   --text: #120f0c;
   --background: #fcfafa;
