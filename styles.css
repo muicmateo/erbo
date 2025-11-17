@@ -1,14 +1,20 @@
 :root {
     --text-color: #120f0c;
     --background-color: #fcfafa;
-    --primary-color: #be754e; /* Primäre Farbe für Rahmen und Akzente */
-    --secondary-color: #f38950; /* Sekundäre Farbe für den aktiven Tab */
-    --accent-color: #ffc43b; /* Akzentfarbe (hier nicht primär verwendet, aber definiert) */
+    --primary-color: #be754e;
+    --secondary-color: #f38950;
+    --accent-color: #ffc43b;
     --border-style: 1px solid var(--text-color);
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", "Open Sans", "Helvetica Neue", sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
@@ -20,25 +26,24 @@ body {
 }
 
 .container {
-    width: 900px; /* Definierte Breite für das Mockup-Fenster */
+    width: 900px;
     border: var(--border-style);
-    background-color: #fff; /* Innenbereich etwas heller */
+    background-color: #fff;
 }
 
-/* --- Header und Titelbereich --- */
-
+/* Header */
 .header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: var(--border-style);
-    padding: 10px 0; /* Padding oben/unten */
-    margin: 0 10px; /* Abstand zu den Seiten, damit die Pfeile außen sind */
+    padding: 10px 0;
+    margin: 0 10px;
 }
 
 .title-container {
     text-align: center;
-    flex-grow: 1; /* Nimmt den meisten Platz ein */
+    flex-grow: 1;
 }
 
 .mockup-label {
@@ -52,7 +57,7 @@ body {
     margin: 0;
     padding: 5px 20px;
     border: var(--border-style);
-    display: inline-block; /* Passt sich der Textlänge an */
+    display: inline-block;
 }
 
 .arrow {
@@ -71,15 +76,14 @@ body {
     border-left: 15px solid var(--primary-color);
 }
 
-/* --- Navigationsleiste (Tabs) --- */
-
+/* Tabs Navigation */
 .tabs-nav {
     display: flex;
     border-bottom: var(--border-style);
 }
 
 .tab-button {
-    flex-grow: 1; /* Gleiche Breite für alle Buttons */
+    flex-grow: 1;
     padding: 10px 0;
     border: none;
     border-right: var(--border-style);
@@ -88,35 +92,47 @@ body {
     font-size: 1em;
     cursor: pointer;
     transition: background-color 0.2s;
+    text-decoration: none;
+    text-align: center;
 }
 
 .tab-button:last-child {
     border-right: none;
 }
 
-/* Aktiver Tab */
+.tab-button:hover {
+    background-color: rgba(243, 137, 80, 0.1);
+}
+
 .tab-button.active {
-    background-color: var(--secondary-color); /* Sekundäre Farbe */
+    background-color: var(--secondary-color);
     color: #fff;
-    border-color: var(--secondary-color);
-    /* Umrandung des aktiven Tabs wie im Mockup */
     border-top: var(--border-style);
     border-left: var(--border-style);
     border-right: var(--border-style);
-    border-bottom: none; /* Wichtig: Untere Linie fehlt */
-    margin-bottom: -1px; /* Überlappt die untere Linie leicht */
-    z-index: 1; /* Überlagert die untere Linie */
+    border-bottom: none;
+    margin-bottom: -1px;
+    z-index: 1;
+    position: relative;
 }
 
-/* --- Hauptinhaltsbereich --- */
-
+/* Content Area */
 .content-area {
     display: flex;
     padding: 20px;
 }
 
+.tab-content {
+    display: none;
+    width: 100%;
+}
+
+.tab-content.active {
+    display: flex;
+}
+
 .left-panel, .right-panel {
-    min-height: 400px; /* Beispielhöhe */
+    min-height: 400px;
     border: var(--border-style);
     padding: 20px;
     display: flex;
@@ -126,7 +142,7 @@ body {
 }
 
 .left-panel {
-    flex: 2; /* Nimmt mehr Platz ein (Verhältnis ca. 2:1) */
+    flex: 2;
     margin-right: 20px;
 }
 
@@ -138,54 +154,4 @@ body {
     font-size: 1.5em;
     color: var(--text-color);
     opacity: 0.6;
-}
-* {
-  --text: #120f0c;
-  --background: #fcfafa;
-  --primary: #f38950;
-  --secondary: #be754e;
-  --accent: #e58b5a;
-
-  margin: 0;
-  padding: 0;
-  color: var(--text);
-  font-family: "Segoe UI", "Open Sans", "Helvetica Neue", sans-serif;
-}
-header {
-  background-color: var(--background);
-  text-align: center;
-  padding: 40px;
-}
-nav {
-  padding: 10px;
-  background-color: var(--primary);
-  display: flex;
-  justify-content: space-evenly;
-}
-nav ul {
-  font-size: 16px;
-  font-weight: bold;
-  list-style-type: none;
-  padding: 0px;
-  margin: 0px;
-  overflow: hidden;
-}
-nav li {
-  float: left;
-}
-nav li:hover {
-  background-color: var(--secondary);
-}
-nav a {
-  text-decoration: none;
-  padding: 15px;
-  display: block;
-  text-align: center;
-}
-nav a:hover {
-  color: rgb(255, 255, 255);
-}
-section {
-  background-color: var(--background);
-  padding: 20px;
 }

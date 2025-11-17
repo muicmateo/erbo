@@ -1,31 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header>
-        <h1>ERBO</h1>
-    </header>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERBO - Güter- und Erbrecht Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <span class="arrow left-arrow"></span>
+                <div class="title-container">
+                    <div class="mockup-label">ERBO SPA</div>
+                    <h1 class="main-title">Güter- und Erbrecht Calculator</h1>
+                </div>
+                <span class="arrow right-arrow"></span>
+            </div>
+        </header>
 
-    <nav>
-        <ul>
-            <li><a href="index.html">Familie</a></li>
-            <li><a href="vermoegen.html">Vermögen</a></li>
-            <li><a href="berechnung.html">Berechnung</a></li>
-            <li><a href="ergebnis.html">Ergebnis</a></li>
-        </ul>
-    </nav>
+        <nav class="tabs-nav">
+            <button class="tab-button active" data-tab="familie">Familie</button>
+            <button class="tab-button" data-tab="vermoegen">Vermögen</button>
+            <button class="tab-button" data-tab="berechnung">Berechnung</button>
+            <button class="tab-button" data-tab="ergebnis">Ergebnis</button>
+        </nav>
 
-    <article></article>
+        <main class="content-area">
+            <!-- Tab 1: Familie -->
+            <div id="familie" class="tab-content active">
+                <div class="left-panel">
+                    <p class="panel-label">Familienmitglieder</p>
+                </div>
+                <div class="right-panel">
+                    <p class="panel-label">Stammbaum</p>
+                </div>
+            </div>
 
-    <section></section>
+            <!-- Tab 2: Vermögen -->
+            <div id="vermoegen" class="tab-content">
+                <div class="left-panel">
+                    <p class="panel-label">Vermögensübersicht</p>
+                </div>
+                <div class="right-panel">
+                    <p class="panel-label">Visualisierung</p>
+                </div>
+            </div>
 
-    <aside></aside>
+            <!-- Tab 3: Berechnung -->
+            <div id="berechnung" class="tab-content">
+                <div class="left-panel">
+                    <p class="panel-label">Teilungsarten</p>
+                </div>
+                <div class="right-panel">
+                    <p class="panel-label">Zusammenfassung</p>
+                </div>
+            </div>
 
-    <footer></footer>
-  </body>
+            <!-- Tab 4: Ergebnis -->
+            <div id="ergebnis" class="tab-content">
+                <div class="left-panel">
+                    <p class="panel-label">Ergebnisübersicht</p>
+                </div>
+                <div class="right-panel">
+                    <p class="panel-label">Details</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
