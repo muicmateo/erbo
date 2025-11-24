@@ -27,7 +27,6 @@ body {
 
 .container {
     width: 900px;
-    border: var(--border-style);
     background-color: #fff;
 }
 

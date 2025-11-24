@@ -35,14 +35,18 @@
                         <div class="form-content">
                             <h3>Familienmitglieder hinzufügen</h3>
                             <input type="text" id="name-input" placeholder="Name eingeben" class="input-field">
-                            <input type="text" id="beziehung-input" placeholder="Beziehung (z.B. Ehepartner)" class="input-field">
+                            <label for="beziehung-input" class="visually-hidden">Beziehung</label>
+                            <select id="beziehung-input" class="input-field">
+                                <option value="" disabled selected>Beziehung wählen</option>
+                                <option value="ehepartner">Ehepartner</option>
+                                <option value="kind">Kind</option>
+                                <option value="eltern">Eltern</option>
+                                <option value="geschwister">Geschwister</option>
+                                <option value="sonstige">Sonstige</option>
+                            </select>
                             <button class="add-button">Person hinzufügen</button>
                             <div id="familien-liste" class="liste"></div>
                         </div>
-                    </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Stammbaum Vorschau</p>
-                        <div id="stammbaum-preview"></div>
                     </div>
                 </div>
                 <button id="complete-familie" class="complete-button" disabled>Weiter zu Vermögen →</button>
@@ -58,46 +62,26 @@
                     <div class="left-panel">
                         <div class="form-content">
                             <h3>Vermögenswerte erfassen</h3>
-                            <input type="text" id="vermoegen-art" placeholder="Art (z.B. Immobilie)" class="input-field">
-                            <input type="number" id="vermoegen-wert" placeholder="Wert in CHF" class="input-field">
+                            <label for="vermoegen-art" class="visually-hidden">Vermögensart</label>
+                            <select id="vermoegen-art" class="input-field">
+                                <option value="" disabled selected>Art wählen</option>
+                                <option value="geld">Geld (Bar/Bank)</option>
+                                <option value="haus">Haus / Immobilie</option>
+                                <option value="auto">Auto</option>
+                                <option value="wertpapiere">Wertpapiere</option>
+                                <option value="kunst">Kunst / Antiquitäten</option>
+                                <option value="sonstige">Sonstige</option>
+                            </select>
+                            <input type="number" id="vermoegen-wert" placeholder="Wert in CHF" class="input-field" min="0" step="0.01">
                             <button class="add-button">Vermögen hinzufügen</button>
                             <div id="vermoegen-liste" class="liste"></div>
                         </div>
                     </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Visualisierung</p>
-                        <div id="vermoegen-chart"></div>
-                    </div>
                 </div>
-                <button id="complete-vermoegen" class="complete-button" disabled>Weiter zu Berechnung →</button>
+                <button id="complete-vermoegen" class="complete-button" disabled>Weiter zu Ergebnis →</button>
             </section>
 
-            <!-- Sektion 3: Berechnung -->
-            <section id="berechnung" class="content-section locked">
-                <div class="lock-overlay">
-                    <p>🔒 Bitte erst Vermögen-Sektion abschließen</p>
-                </div>
-                <h2 class="section-title">Berechnung</h2>
-                <div class="section-container">
-                    <div class="left-panel">
-                        <div class="form-content">
-                            <h3>Teilungsart wählen</h3>
-                            <div class="radio-group">
-                                <label><input type="radio" name="teilung" value="gesetzlich"> Gesetzliche Erbfolge</label>
-                                <label><input type="radio" name="teilung" value="testament"> Testament vorhanden</label>
-                                <label><input type="radio" name="teilung" value="erbvertrag"> Erbvertrag</label>
-                            </div>
-                            <button class="add-button">Teilung bestätigen</button>
-                        </div>
-                    </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Zusammenfassung</p>
-                    </div>
-                </div>
-                <button id="complete-berechnung" class="complete-button" disabled>Weiter zu Ergebnis →</button>
-            </section>
-
-            <!-- Sektion 4: Ergebnis -->
+            <!-- Sektion 3: Ergebnis -->
             <section id="ergebnis" class="content-section locked">
                 <div class="lock-overlay">
                     <p>🔒 Bitte erst Berechnung-Sektion abschließen</p>
@@ -107,9 +91,6 @@
                     <div class="left-panel">
                         <p class="panel-label">Ergebnisübersicht</p>
                         <div id="ergebnis-content"></div>
-                    </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Details</p>
                     </div>
                 </div>
                 <button class="complete-button final-button">Berechnung abschließen ✓</button>
