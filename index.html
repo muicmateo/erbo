@@ -4,115 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERBO - Güter- und Erbrecht Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <div class="app-wrapper">
         <header class="header">
-            <div class="header-content">
-                <span class="arrow left-arrow"></span>
-                <div class="title-container">
-                    <div class="mockup-label">ERBO</div>
-                    <h1 class="main-title">Güter- und Erbrecht Calculator</h1>
-                </div>
-                <span class="arrow right-arrow"></span>
+            <div class="logo-area">
+                <div class="logo-box">ERBO</div>
+                <h1 class="main-title">Güter- & Erbrecht Rechner</h1>
+            </div>
+            <div class="step-indicator">
+                <div class="step active" data-step="familie">1. Familie</div>
+                <div class="line"></div>
+                <div class="step" data-step="vermoegen">2. Vermögen</div>
+                <div class="line"></div>
+                <div class="step" data-step="berechnung">3. Teilung</div>
+                <div class="line"></div>
+                <div class="step" data-step="ergebnis">4. Ergebnis</div>
             </div>
         </header>
 
-        <nav class="tabs-nav">
-            <a href="#familie" class="tab-button active">Familie</a>
-            <a href="#vermoegen" class="tab-button disabled">Vermögen</a>
-            <a href="#berechnung" class="tab-button disabled">Berechnung</a>
-            <a href="#ergebnis" class="tab-button disabled">Ergebnis</a>
-        </nav>
+        <main class="main-content">
+            <section id="familie" class="card active">
+                <div class="card-header">
+                    <h2>Familienkonstellation</h2>
+                    <p class="subtitle">Erfassen Sie alle relevanten Personen.</p>
+                </div>
+                
+                <div class="card-body split-view">
+                    <div class="input-panel">
+                        <div class="form-group">
+                            <label for="name-input">Vorname / Name</label>
+                            <input type="text" id="name-input" placeholder="z.B. Anna Müller">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="beziehung-select">Beziehung zum Erblasser</label>
+                            <select id="beziehung-select" class="dropdown-select">
+                                <option value="" disabled selected>Bitte wählen...</option>
+                                <option value="Ehepartner">Ehepartner / Eingetragener Partner</option>
+                                <option value="Kind">Kind (Nachkomme)</option>
+                                <option value="Elternteil">Elternteil</option>
+                                <option value="Geschwister">Geschwister</option>
+                                <option value="Enkel">Enkel</option>
+                                <option value="Grosseltern">Grosseltern</option>
+                                <option value="Anderer">Andere Person</option>
+                            </select>
+                        </div>
 
-        <main class="scroll-content">
-            <!-- Sektion 1: Familie -->
-            <section id="familie" class="content-section active">
-                <h2 class="section-title">Familie</h2>
-                <div class="section-container">
-                    <div class="left-panel">
-                        <div class="form-content">
-                            <h3>Familienmitglieder hinzufügen</h3>
-                            <input type="text" id="name-input" placeholder="Name eingeben" class="input-field">
-                            <input type="text" id="beziehung-input" placeholder="Beziehung (z.B. Ehepartner)" class="input-field">
-                            <button class="add-button">Person hinzufügen</button>
-                            <div id="familien-liste" class="liste"></div>
+                        <button class="btn-primary add-button">
+                            <span class="plus-icon">+</span> Hinzufügen
+                        </button>
+                    </div>
+
+                    <div class="display-panel">
+                        <div class="panel-header">Erfasste Personen</div>
+                        <div id="familien-liste" class="list-container empty-state">
+                            <span class="placeholder-text">Noch keine Personen hinzugefügt</span>
                         </div>
                     </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Stammbaum Vorschau</p>
-                        <div id="stammbaum-preview"></div>
-                    </div>
                 </div>
-                <button id="complete-familie" class="complete-button" disabled>Weiter zu Vermögen →</button>
+                
+                <div class="card-footer">
+                    <button id="complete-familie" class="btn-next" disabled>Weiter zu Vermögen</button>
+                </div>
             </section>
 
-            <!-- Sektion 2: Vermögen -->
-            <section id="vermoegen" class="content-section locked">
-                <div class="lock-overlay">
-                    <p>🔒 Bitte erst Familie-Sektion abschließen</p>
+            <section id="vermoegen" class="card locked">
+                <div class="blur-overlay">
+                    <div class="lock-message">
+                        <span class="lock-icon">🔒</span>
+                        <p>Bitte schließen Sie zuerst den Schritt "Familie" ab.</p>
+                    </div>
                 </div>
-                <h2 class="section-title">Vermögen</h2>
-                <div class="section-container">
-                    <div class="left-panel">
-                        <div class="form-content">
-                            <h3>Vermögenswerte erfassen</h3>
-                            <input type="text" id="vermoegen-art" placeholder="Art (z.B. Immobilie)" class="input-field">
-                            <input type="number" id="vermoegen-wert" placeholder="Wert in CHF" class="input-field">
-                            <button class="add-button">Vermögen hinzufügen</button>
-                            <div id="vermoegen-liste" class="liste"></div>
+
+                <div class="card-header">
+                    <h2>Vermögenswerte</h2>
+                    <p class="subtitle">Listen Sie alle Aktiven und Passiven auf.</p>
+                </div>
+
+                <div class="card-body split-view">
+                    <div class="input-panel">
+                        <div class="form-group">
+                            <label for="vermoegen-art">Bezeichnung</label>
+                            <input type="text" id="vermoegen-art" placeholder="z.B. Einfamilienhaus">
                         </div>
+                        <div class="form-group">
+                            <label for="vermoegen-wert">Wert (CHF)</label>
+                            <input type="number" id="vermoegen-wert" placeholder="0.00">
+                        </div>
+                        <button class="btn-primary add-button">
+                            <span class="plus-icon">+</span> Wert hinzufügen
+                        </button>
                     </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Visualisierung</p>
-                        <div id="vermoegen-chart"></div>
+
+                    <div class="display-panel">
+                        <div class="panel-header">Vermögensübersicht</div>
+                        <div id="vermoegen-liste" class="list-container empty-state">
+                            <span class="placeholder-text">Keine Werte erfasst</span>
+                        </div>
+                        <div id="asset-bar-container" class="bar-container"></div>
                     </div>
                 </div>
-                <button id="complete-vermoegen" class="complete-button" disabled>Weiter zu Berechnung →</button>
+
+                <div class="card-footer">
+                    <button id="complete-vermoegen" class="btn-next" disabled>Weiter zur Berechnung</button>
+                </div>
             </section>
 
-            <!-- Sektion 3: Berechnung -->
-            <section id="berechnung" class="content-section locked">
-                <div class="lock-overlay">
-                    <p>🔒 Bitte erst Vermögen-Sektion abschließen</p>
+            <section id="berechnung" class="card locked">
+                <div class="blur-overlay">
+                    <div class="lock-message">
+                        <span class="lock-icon">🔒</span>
+                        <p>Bitte erfassen Sie zuerst das Vermögen.</p>
+                    </div>
                 </div>
-                <h2 class="section-title">Berechnung</h2>
-                <div class="section-container">
-                    <div class="left-panel">
-                        <div class="form-content">
-                            <h3>Teilungsart wählen</h3>
-                            <div class="radio-group">
-                                <label><input type="radio" name="teilung" value="gesetzlich"> Gesetzliche Erbfolge</label>
-                                <label><input type="radio" name="teilung" value="testament"> Testament vorhanden</label>
-                                <label><input type="radio" name="teilung" value="erbvertrag"> Erbvertrag</label>
+
+                <div class="card-header">
+                    <h2>Teilungsart</h2>
+                    <p class="subtitle">Nach welchen Regeln soll geteilt werden?</p>
+                </div>
+
+                <div class="card-body">
+                    <div class="selection-grid">
+                        <label class="radio-card">
+                            <input type="radio" name="teilung" value="gesetzlich">
+                            <div class="radio-content">
+                                <h3>Gesetzliche Erbfolge</h3>
+                                <p>Nach ZGB (Standard)</p>
                             </div>
-                            <button class="add-button">Teilung bestätigen</button>
-                        </div>
-                    </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Zusammenfassung</p>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="teilung" value="testament">
+                            <div class="radio-content">
+                                <h3>Testament</h3>
+                                <p>Individuelle Quote</p>
+                            </div>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="teilung" value="erbvertrag">
+                            <div class="radio-content">
+                                <h3>Erbvertrag</h3>
+                                <p>Vereinbarte Teilung</p>
+                            </div>
+                        </label>
                     </div>
                 </div>
-                <button id="complete-berechnung" class="complete-button" disabled>Weiter zu Ergebnis →</button>
+
+                <div class="card-footer">
+                    <button id="complete-berechnung" class="btn-next" disabled>Ergebnis anzeigen</button>
+                </div>
             </section>
 
-            <!-- Sektion 4: Ergebnis -->
-            <section id="ergebnis" class="content-section locked">
-                <div class="lock-overlay">
-                    <p>🔒 Bitte erst Berechnung-Sektion abschließen</p>
-                </div>
-                <h2 class="section-title">Ergebnis</h2>
-                <div class="section-container">
-                    <div class="left-panel">
-                        <p class="panel-label">Ergebnisübersicht</p>
-                        <div id="ergebnis-content"></div>
-                    </div>
-                    <div class="right-panel">
-                        <p class="panel-label">Details</p>
+            <section id="ergebnis" class="card locked">
+                <div class="blur-overlay">
+                    <div class="lock-message">
+                        <span class="lock-icon">🔒</span>
                     </div>
                 </div>
-                <button class="complete-button final-button">Berechnung abschließen ✓</button>
+
+                <div class="card-header">
+                    <h2>Resultat</h2>
+                    <p class="subtitle">Zusammenfassung der Erbteilung</p>
+                </div>
+
+                <div class="card-body">
+                    <div id="ergebnis-content" class="result-box">
+                        </div>
+                </div>
+
+                <div class="card-footer">
+                    <button class="btn-secondary" onclick="location.reload()">Neuberechnung starten</button>
+                </div>
             </section>
         </main>
     </div>
