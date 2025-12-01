@@ -19,9 +19,7 @@
                 <div class="line"></div>
                 <div class="step" data-step="vermoegen">2. Vermögen</div>
                 <div class="line"></div>
-                <div class="step" data-step="berechnung">3. Teilung</div>
-                <div class="line"></div>
-                <div class="step" data-step="ergebnis">4. Ergebnis</div>
+                <div class="step" data-step="ergebnis">3. Ergebnis</div>
             </div>
         </header>
 
@@ -48,8 +46,12 @@
                                 <option value="Elternteil">Elternteil</option>
                                 <option value="Geschwister">Geschwister</option>
                                 <option value="Enkel">Enkel</option>
+                                <option value="Elternteil">Elternteil</option>
+                                <option value="Geschwister">Geschwister</option>
                                 <option value="Grosseltern">Grosseltern</option>
-                                <option value="Anderer">Andere Person</option>
+                                <option value="OnkelTante">Onkel / Tante</option>
+                                <option value="Cousin">Cousin / Cousine</option>
+                                <option value="Anderer">Andere / Erweiterte Familie</option>
                             </select>
                         </div>
 
@@ -109,51 +111,7 @@
                 </div>
 
                 <div class="card-footer">
-                    <button id="complete-vermoegen" class="btn-next" disabled>Weiter zur Berechnung</button>
-                </div>
-            </section>
-
-            <section id="berechnung" class="card locked">
-                <div class="blur-overlay">
-                    <div class="lock-message">
-                        <span class="lock-icon">🔒</span>
-                        <p>Bitte erfassen Sie zuerst das Vermögen.</p>
-                    </div>
-                </div>
-
-                <div class="card-header">
-                    <h2>Teilungsart</h2>
-                    <p class="subtitle">Nach welchen Regeln soll geteilt werden?</p>
-                </div>
-
-                <div class="card-body">
-                    <div class="selection-grid">
-                        <label class="radio-card">
-                            <input type="radio" name="teilung" value="gesetzlich">
-                            <div class="radio-content">
-                                <h3>Gesetzliche Erbfolge</h3>
-                                <p>Nach ZGB (Standard)</p>
-                            </div>
-                        </label>
-                        <label class="radio-card">
-                            <input type="radio" name="teilung" value="testament">
-                            <div class="radio-content">
-                                <h3>Testament</h3>
-                                <p>Individuelle Quote</p>
-                            </div>
-                        </label>
-                        <label class="radio-card">
-                            <input type="radio" name="teilung" value="erbvertrag">
-                            <div class="radio-content">
-                                <h3>Erbvertrag</h3>
-                                <p>Vereinbarte Teilung</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="card-footer">
-                    <button id="complete-berechnung" class="btn-next" disabled>Ergebnis anzeigen</button>
+                    <button id="complete-vermoegen" class="btn-next" disabled>Ergebnis anzeigen</button>
                 </div>
             </section>
 
@@ -171,7 +129,13 @@
 
                 <div class="card-body">
                     <div id="ergebnis-content" class="result-box">
-                        </div>
+                    </div>
+                    
+                    <div id="history-section" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; display: none;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: #7f8c8d;">Verlauf (Letzte Berechnungen)</h3>
+                        <div id="history-list" class="list-container" style="max-height: 200px;"></div>
+                        <button id="clear-history" class="btn-secondary" style="margin-top: 10px; font-size: 0.8rem;">Verlauf löschen</button>
+                    </div>
                 </div>
 
                 <div class="card-footer">
