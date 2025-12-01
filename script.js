@@ -146,8 +146,7 @@ function renderVermoegenListe() {
             bar.title = `${v.art}: ${Math.round(width)}%`;
             assetBarContainer.appendChild(bar);
         }
-    });
-}
+    }
 
 function removeAsset(index) {
     if (index < 0 || index >= vermoegenswerte.length) return;
@@ -345,7 +344,21 @@ function generateErgebnis() {
                     </div>
                     <div class="share-value">${fmt(amount)}</div>
                 </div>
+                <button class="delete-btn" style="color:red; background:none; border:none; font-size:1.1rem;">&times;</button>
             `;
+            el.querySelector('.delete-btn').addEventListener('click', () => this.removeAsset(index));
+            container.appendChild(el);
+
+            // Bar Chart Segment
+            if (total > 0) {
+                const width = (asset.wert / total) * 100;
+                const bar = document.createElement('div');
+                bar.className = 'bar-segment';
+                bar.style.width = `${width}%`;
+                bar.style.backgroundColor = COLORS[index % COLORS.length];
+                bar.title = `${asset.art}: ${Math.round(width)}%`;
+                barContainer.appendChild(bar);
+            }
         });
     }
 
