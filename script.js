@@ -1,6 +1,7 @@
 // ========== DATA ==========
 let familienMitglieder = [];
 let vermoegenswerte = [];
+let currentScenario = 'death'; // Default
 
 // ========== HELPER ==========
 function formatCHF(value) {
@@ -18,6 +19,33 @@ function unlockStep(stepId) {
     
     if (indicator) indicator.classList.add('active');
 }
+
+// ========== 0. SZENARIO ==========
+const scenarioCards = document.querySelectorAll('.scenario-card');
+const completeSzenarioBtn = document.getElementById('complete-szenario');
+
+scenarioCards.forEach(card => {
+    card.addEventListener('click', () => {
+        // Visuelle Auswahl
+        scenarioCards.forEach(c => {
+            c.classList.remove('selected');
+            c.style.background = 'white';
+            c.style.borderColor = '#e0e6ed';
+        });
+        card.classList.add('selected');
+        card.style.background = '#f0f7ff';
+        card.style.borderColor = '#3498db';
+        
+        // Wert setzen
+        currentScenario = card.getAttribute('data-value');
+    });
+});
+
+completeSzenarioBtn.addEventListener('click', () => {
+    unlockStep('familie');
+    document.getElementById('szenario').classList.remove('active');
+    document.getElementById('familie').classList.add('active');
+});
 
 // ========== 1. FAMILIE ==========
 const nameInput = document.getElementById('name-input');
@@ -92,6 +120,53 @@ const vermoegenListe = document.getElementById('vermoegen-liste');
 const assetBarContainer = document.getElementById('asset-bar-container');
 const addVermoegenBtn = document.querySelector('#vermoegen .add-button');
 const completeVermoegenBtn = document.getElementById('complete-vermoegen');
+const eigengutErblasserInput = document.getElementById('eigengut-erblasser');
+const errungenschaftErblasserInput = document.getElementById('errungenschaft-erblasser');
+const eigengutPartnerInput = document.getElementById('eigengut-partner');
+const errungenschaftPartnerInput = document.getElementById('errungenschaft-partner');
+const completeGueterrechtBtn = document.getElementById('complete-gueterrecht');
+const vorsorgeContainer = document.getElementById('vorsorge-container');
+const pkErblasserInput = document.getElementById('pk-erblasser');
+const pkPartnerInput = document.getElementById('pk-partner');
+
+function updateGueterrechtUI() {
+    const isDivorce = currentScenario === 'divorce';
+    
+    // Labels anpassen
+    const lblEgE = document.querySelector('label[for="eigengut-erblasser"]');
+    const lblErrE = document.querySelector('label[for="errungenschaft-erblasser"]');
+    const lblEgP = document.querySelector('label[for="eigengut-partner"]');
+    const lblErrP = document.querySelector('label[for="errungenschaft-partner"]');
+    const lblPkE = document.querySelector('label[for="pk-erblasser"]');
+    
+    if (isDivorce) {
+        if(lblEgE) lblEgE.textContent = "Eigengut Ehegatte 1 (CHF)";
+        if(lblErrE) lblErrE.textContent = "Errungenschaft Ehegatte 1 (CHF)";
+        if(lblEgP) lblEgP.textContent = "Eigengut Ehegatte 2 (CHF)";
+        if(lblErrP) lblErrP.textContent = "Errungenschaft Ehegatte 2 (CHF)";
+        if(lblPkE) lblPkE.textContent = "Pensionskasse Ehegatte 1 (CHF)";
+        document.querySelector('label[for="pk-partner"]').textContent = "Pensionskasse Ehegatte 2 (CHF)";
+        
+        if(vorsorgeContainer) vorsorgeContainer.style.display = 'block';
+    } else {
+        if(lblEgE) lblEgE.textContent = "Eigengut Erblasser (CHF)";
+        if(lblErrE) lblErrE.textContent = "Errungenschaft Erblasser (CHF)";
+        if(lblEgP) lblEgP.textContent = "Eigengut Partner (CHF)";
+        if(lblErrP) lblErrP.textContent = "Errungenschaft Partner (CHF)";
+        
+        if(vorsorgeContainer) vorsorgeContainer.style.display = 'none';
+    }
+}
+
+// Trigger UI update when entering step
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.target.id === 'gueterrecht' && mutation.target.classList.contains('active')) {
+            updateGueterrechtUI();
+        }
+    });
+});
+observer.observe(document.getElementById('gueterrecht'), { attributes: true, attributeFilter: ['class'] });
 
 function renderVermoegenListe() {
     vermoegenListe.innerHTML = '';
@@ -146,7 +221,8 @@ function renderVermoegenListe() {
             bar.title = `${v.art}: ${Math.round(width)}%`;
             assetBarContainer.appendChild(bar);
         }
-    }
+    });
+}
 
 function removeAsset(index) {
     if (index < 0 || index >= vermoegenswerte.length) return;
@@ -177,17 +253,148 @@ addVermoegenBtn.addEventListener('click', () => {
 });
 
 completeVermoegenBtn.addEventListener('click', () => {
+    const hasSpouse = familienMitglieder.some(p => /^ehepartner/i.test(p.beziehung));
+
+    if (hasSpouse) {
+        unlockStep('gueterrecht');
+        document.getElementById('vermoegen').classList.remove('active');
+        document.getElementById('gueterrecht').classList.add('active');
+    } else {
+        unlockStep('ergebnis');
+        document.getElementById('vermoegen').classList.remove('active');
+        document.getElementById('ergebnis').classList.add('active');
+        generateErgebnis();
+    }
+});
+
+// ========== 3. GÜTERRECHT ==========
+completeGueterrechtBtn?.addEventListener('click', () => {
     unlockStep('ergebnis');
-    document.getElementById('vermoegen').classList.remove('active');
+    document.getElementById('gueterrecht').classList.remove('active');
     document.getElementById('ergebnis').classList.add('active');
     generateErgebnis();
 });
 
-// ========== 3. ERGEBNIS (Gesetzliche Erbfolge nach ZGB) ==========
+// ========== 4. ERGEBNIS (Gesetzliche Erbfolge nach ZGB) ==========
 function generateErgebnis() {
     const ergebnisContent = document.getElementById('ergebnis-content');
-    const gesamtVermoegen = vermoegenswerte.reduce((sum, v) => sum + v.wert, 0);
+    const totalAssets = vermoegenswerte.reduce((sum, v) => sum + v.wert, 0);
+    const scenario = currentScenario;
+    const hasSpouse = familienMitglieder.some(p => /^ehepartner/i.test(p.beziehung));
 
+    const parse = (input) => parseFloat(input?.value || '0') || 0;
+    const egE = parse(eigengutErblasserInput);
+    const errE = parse(errungenschaftErblasserInput);
+    const egP = parse(eigengutPartnerInput);
+    const errP = parse(errungenschaftPartnerInput);
+    const pkE = parse(pkErblasserInput);
+    const pkP = parse(pkPartnerInput);
+
+    let gueterrechtHtml = '';
+    let nachlass = totalAssets;
+    let spouseGueterAnteil = 0;
+
+    if (hasSpouse) {
+        let totalErr = errE + errP;
+        let fallbackErr = false;
+        if (totalErr === 0 && totalAssets > 0) {
+            totalErr = totalAssets;
+            fallbackErr = true;
+        }
+
+        const hälfteErr = totalErr / 2;
+        const erblasserNachGueter = egE + hälfteErr;
+        const partnerNachGueter = egP + hälfteErr;
+
+        if (scenario === 'divorce') {
+            const fallbackNotice = fallbackErr ? '<div style="grid-column:1/3; color:#7f8c8d; font-size:0.85rem;">Hinweis: Errungenschaft mangels Angaben aus dem Vermögens-Total geschätzt.</div>' : '';
+            
+            // Vorsorgeausgleich Berechnung
+            let vorsorgeHtml = '';
+            if (pkE + pkP > 0) {
+                const totalPK = pkE + pkP;
+                const halfPK = totalPK / 2;
+                const diff = halfPK - pkE; // Positiv: E erhält, Negativ: E zahlt
+                const transferText = diff > 0 
+                    ? `Ehegatte 2 schuldet Ehegatte 1: <strong>${formatCHF(diff)}</strong>`
+                    : `Ehegatte 1 schuldet Ehegatte 2: <strong>${formatCHF(Math.abs(diff))}</strong>`;
+                
+                vorsorgeHtml = `
+                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid #ddd;">
+                        <h5 style="margin:0 0 10px 0; color:#2c3e50;">Vorsorgeausgleich (BVG)</h5>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; font-size:0.9rem;">
+                            <div>Total Guthaben:</div><div style="text-align:right">${formatCHF(totalPK)}</div>
+                            <div>Anspruch je Gatte:</div><div style="text-align:right">${formatCHF(halfPK)}</div>
+                            <div style="grid-column:1/3; margin-top:5px; color:#27ae60;">${transferText}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Info-Boxen für weitere Scheidungsfolgen
+            const infoHtml = `
+                <div style="margin-top:20px; display:grid; gap:10px;">
+                    <div style="background:white; padding:10px; border-radius:6px; border:1px solid #eee;">
+                        <strong>🏠 Familienwohnung</strong><br>
+                        <span style="font-size:0.85rem; color:#666;">Kann bei Bedarf einem Ehegatten zugewiesen werden (Art. 121 ZGB).</span>
+                    </div>
+                    <div style="background:white; padding:10px; border-radius:6px; border:1px solid #eee;">
+                        <strong>💰 Unterhalt</strong><br>
+                        <span style="font-size:0.85rem; color:#666;">Anspruch besteht, wenn Eigenversorgung nicht zumutbar ist (Art. 125 ZGB).</span>
+                    </div>
+                    <div style="background:white; padding:10px; border-radius:6px; border:1px solid #eee;">
+                        <strong>👶 Kinder</strong><br>
+                        <span style="font-size:0.85rem; color:#666;">Gericht regelt Sorge, Obhut und Unterhalt (Art. 133 ZGB).</span>
+                    </div>
+                </div>
+            `;
+
+            gueterrechtHtml = `
+                <div style="margin-bottom:20px; padding:15px; background:#f0f7ff; border-radius:8px; border-left:4px solid #3498db;">
+                    <h4 style="margin-top:0; color:#2c3e50;">Scheidungsfolgen</h4>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.9rem;">
+                        <div>Eigengut Ehegatte 1:</div><div style="text-align:right">${formatCHF(egE)}</div>
+                        <div>Eigengut Ehegatte 2:</div><div style="text-align:right">${formatCHF(egP)}</div>
+                        <div>Gesamte Errungenschaft:</div><div style="text-align:right">${formatCHF(totalErr)}</div>
+                        ${fallbackNotice}
+                        <div style="border-top:1px solid #ccc; padding-top:6px; font-weight:bold;">Zuweisung Ehegatte 1:</div><div style="border-top:1px solid #ccc; padding-top:6px; font-weight:bold; text-align:right;">${formatCHF(erblasserNachGueter)}</div>
+                        <div style="font-weight:bold;">Zuweisung Ehegatte 2:</div><div style="font-weight:bold; text-align:right;">${formatCHF(partnerNachGueter)}</div>
+                    </div>
+                    ${vorsorgeHtml}
+                    ${infoHtml}
+                </div>
+            `;
+
+            ergebnisContent.innerHTML = gueterrechtHtml;
+            return;
+        }
+
+        // Todesfall
+        nachlass = erblasserNachGueter;
+        spouseGueterAnteil = partnerNachGueter;
+        gueterrechtHtml = `
+            <div style="margin-bottom:20px; padding:15px; background:#f0f7ff; border-radius:8px; border-left:4px solid #3498db;">
+                <h4 style="margin-top:0; color:#2c3e50;">Güterrecht (Todesfall)</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:0.9rem;">
+                    <div>Eigengut Erblasser:</div><div style="text-align:right">${formatCHF(egE)}</div>
+                    <div>Eigengut Partner:</div><div style="text-align:right">${formatCHF(egP)}</div>
+                    <div>Gesamte Errungenschaft:</div><div style="text-align:right">${formatCHF(totalErr)}</div>
+                    <div style="border-top:1px solid #ccc; padding-top:6px; font-weight:bold;">Nachlass (Erblasser):</div><div style="border-top:1px solid #ccc; padding-top:6px; font-weight:bold; text-align:right;">${formatCHF(nachlass)}</div>
+                    <div style="font-weight:bold;">Vorschlag Partner:</div><div style="font-weight:bold; text-align:right;">${formatCHF(partnerNachGueter)}</div>
+                </div>
+            </div>
+        `;
+    } else if (scenario === 'divorce' && !hasSpouse) {
+        gueterrechtHtml = `
+            <div style="margin-bottom:20px; padding:12px; background:#fff3cd; border-radius:8px; border-left:4px solid #f1c40f;">
+                Kein Ehepartner erfasst – Scheidungsrechnung entfällt.
+            </div>
+        `;
+        ergebnisContent.innerHTML = gueterrechtHtml;
+        return;
+    }
+
+    const gesamtVermoegen = nachlass;
     const fmt = (v) => formatCHF(v);
     
     // Helpers für exakte Dropdown-Werte
@@ -321,8 +528,13 @@ function generateErgebnis() {
         familienMitglieder.forEach(p => addShare(p.name, per));
     }
 
+    // Addiere güterrechtlichen Anteil des überlebenden Ehepartners (nur Todesfall)
+    if (spouses.length > 0 && spouseGueterAnteil > 0) {
+        addShare(spouses[0].name, spouseGueterAnteil);
+    }
+
     // ========== HTML OUTPUT ==========
-    let html = `
+    let html = gueterrechtHtml + `
         <div class="total-sum">
             <small style="display:block; font-size:1rem; color:#7f8c8d; font-weight:400">Nachlasswert Total</small>
             ${fmt(gesamtVermoegen)}
@@ -344,21 +556,7 @@ function generateErgebnis() {
                     </div>
                     <div class="share-value">${fmt(amount)}</div>
                 </div>
-                <button class="delete-btn" style="color:red; background:none; border:none; font-size:1.1rem;">&times;</button>
             `;
-            el.querySelector('.delete-btn').addEventListener('click', () => this.removeAsset(index));
-            container.appendChild(el);
-
-            // Bar Chart Segment
-            if (total > 0) {
-                const width = (asset.wert / total) * 100;
-                const bar = document.createElement('div');
-                bar.className = 'bar-segment';
-                bar.style.width = `${width}%`;
-                bar.style.backgroundColor = COLORS[index % COLORS.length];
-                bar.title = `${asset.art}: ${Math.round(width)}%`;
-                barContainer.appendChild(bar);
-            }
         });
     }
 
