@@ -38,13 +38,52 @@ scenarioCards.forEach(card => {
         
         // Wert setzen
         currentScenario = card.getAttribute('data-value');
+        updateStepIndicator();
     });
 });
 
+function updateStepIndicator() {
+    const stepIndicator = document.querySelector('.step-indicator');
+    const isDivorce = currentScenario === 'divorce';
+    
+    if (isDivorce) {
+        stepIndicator.innerHTML = `
+            <div class="step active" data-step="szenario">1. Szenario</div>
+            <div class="line"></div>
+            <div class="step" data-step="vermoegen">2. Vermögen</div>
+            <div class="line"></div>
+            <div class="step" data-step="gueterrecht">3. Güterrecht</div>
+            <div class="line"></div>
+            <div class="step" data-step="ergebnis">4. Ergebnis</div>
+        `;
+        const fam = document.getElementById('familie');
+        if (fam) fam.style.display = 'none';
+    } else {
+        stepIndicator.innerHTML = `
+            <div class="step active" data-step="szenario">1. Szenario</div>
+            <div class="line"></div>
+            <div class="step" data-step="familie">2. Familie</div>
+            <div class="line"></div>
+            <div class="step" data-step="vermoegen">3. Vermögen</div>
+            <div class="line"></div>
+            <div class="step" data-step="gueterrecht">4. Güterrecht</div>
+            <div class="line"></div>
+            <div class="step" data-step="ergebnis">5. Ergebnis</div>
+        `;
+        const fam = document.getElementById('familie');
+        if (fam) fam.style.display = '';
+    }
+}
+
 completeSzenarioBtn.addEventListener('click', () => {
-    unlockStep('familie');
     document.getElementById('szenario').classList.remove('active');
-    document.getElementById('familie').classList.add('active');
+    if (currentScenario === 'divorce') {
+        unlockStep('vermoegen');
+        document.getElementById('vermoegen').classList.add('active');
+    } else {
+        unlockStep('familie');
+        document.getElementById('familie').classList.add('active');
+    }
 });
 
 // ========== 1. FAMILIE ==========
@@ -131,13 +170,20 @@ const pkPartnerInput = document.getElementById('pk-partner');
 
 function updateGueterrechtUI() {
     const isDivorce = currentScenario === 'divorce';
-    
+
     // Labels anpassen
     const lblEgE = document.querySelector('label[for="eigengut-erblasser"]');
     const lblErrE = document.querySelector('label[for="errungenschaft-erblasser"]');
     const lblEgP = document.querySelector('label[for="eigengut-partner"]');
     const lblErrP = document.querySelector('label[for="errungenschaft-partner"]');
     const lblPkE = document.querySelector('label[for="pk-erblasser"]');
+    const lblPkP = document.querySelector('label[for="pk-partner"]');
+
+    // Gruppen (für Ein-/Ausblenden)
+    const grpEgE = document.getElementById('eigengut-erblasser')?.closest('.form-group');
+    const grpErrE = document.getElementById('errungenschaft-erblasser')?.closest('.form-group');
+    const grpEgP = document.getElementById('eigengut-partner')?.closest('.form-group');
+    const grpErrP = document.getElementById('errungenschaft-partner')?.closest('.form-group');
     
     if (isDivorce) {
         if(lblEgE) lblEgE.textContent = "Eigengut Ehegatte 1 (CHF)";
@@ -145,15 +191,25 @@ function updateGueterrechtUI() {
         if(lblEgP) lblEgP.textContent = "Eigengut Ehegatte 2 (CHF)";
         if(lblErrP) lblErrP.textContent = "Errungenschaft Ehegatte 2 (CHF)";
         if(lblPkE) lblPkE.textContent = "Pensionskasse Ehegatte 1 (CHF)";
-        document.querySelector('label[for="pk-partner"]').textContent = "Pensionskasse Ehegatte 2 (CHF)";
+        if(lblPkP) lblPkP.textContent = "Pensionskasse Ehegatte 2 (CHF)";
         
         if(vorsorgeContainer) vorsorgeContainer.style.display = 'block';
+        if (grpEgE) grpEgE.style.display = '';
+        if (grpErrE) grpErrE.style.display = '';
+        if (grpEgP) grpEgP.style.display = '';
+        if (grpErrP) grpErrP.style.display = '';
     } else {
         if(lblEgE) lblEgE.textContent = "Eigengut Erblasser (CHF)";
         if(lblErrE) lblErrE.textContent = "Errungenschaft Erblasser (CHF)";
         if(lblEgP) lblEgP.textContent = "Eigengut Partner (CHF)";
         if(lblErrP) lblErrP.textContent = "Errungenschaft Partner (CHF)";
         
+        // Todesfall: nur notwendige Felder anzeigen (Eg Erblasser, Err Erblasser, Err Partner)
+        if (grpEgE) grpEgE.style.display = '';
+        if (grpErrE) grpErrE.style.display = '';
+        if (grpErrP) grpErrP.style.display = '';
+        if (grpEgP) grpEgP.style.display = 'none';
+
         if(vorsorgeContainer) vorsorgeContainer.style.display = 'none';
     }
 }
@@ -254,8 +310,10 @@ addVermoegenBtn.addEventListener('click', () => {
 
 completeVermoegenBtn.addEventListener('click', () => {
     const hasSpouse = familienMitglieder.some(p => /^ehepartner/i.test(p.beziehung));
+    const isDivorce = currentScenario === 'divorce';
 
-    if (hasSpouse) {
+    // Bei Scheidung immer Güterrecht zeigen, bei Todesfall nur wenn Ehepartner vorhanden
+    if (isDivorce || hasSpouse) {
         unlockStep('gueterrecht');
         document.getElementById('vermoegen').classList.remove('active');
         document.getElementById('gueterrecht').classList.add('active');
