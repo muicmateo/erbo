@@ -15,16 +15,48 @@
                 <h1 class="main-title">Güter- & Erbrecht Rechner</h1>
             </div>
             <div class="step-indicator">
-                <div class="step active" data-step="familie">1. Familie</div>
+                <div class="step active" data-step="szenario">1. Szenario</div>
                 <div class="line"></div>
-                <div class="step" data-step="vermoegen">2. Vermögen</div>
+                <div class="step" data-step="familie">2. Familie</div>
                 <div class="line"></div>
-                <div class="step" data-step="ergebnis">3. Ergebnis</div>
+                <div class="step" data-step="vermoegen">3. Vermögen</div>
+                <div class="line"></div>
+                <div class="step" data-step="gueterrecht">4. Güterrecht</div>
+                <div class="line"></div>
+                <div class="step" data-step="ergebnis">5. Ergebnis</div>
             </div>
         </header>
 
         <main class="main-content">
-            <section id="familie" class="card active">
+            <section id="szenario" class="card active">
+                <div class="card-header">
+                    <h2>Szenario wählen</h2>
+                    <p class="subtitle">Bitte wählen Sie den Anlass der Berechnung.</p>
+                </div>
+                <div class="card-body">
+                    <div class="scenario-options" style="display:flex; gap:20px; justify-content:center; margin: 20px 0;">
+                        <button type="button" class="scenario-card selected" data-value="death" style="flex:1; max-width:200px; padding:20px; border:2px solid #3498db; border-radius:8px; background:#f0f7ff; cursor:pointer; text-align:center; transition:all 0.2s;">
+                            <div style="font-size:2.5rem; margin-bottom:10px;">⚰️</div>
+                            <div style="font-weight:bold; color:#2c3e50;">Todesfall</div>
+                        </button>
+                        <button type="button" class="scenario-card" data-value="divorce" style="flex:1; max-width:200px; padding:20px; border:2px solid #e0e6ed; border-radius:8px; background:white; cursor:pointer; text-align:center; transition:all 0.2s;">
+                            <div style="font-size:2.5rem; margin-bottom:10px;">💔</div>
+                            <div style="font-weight:bold; color:#2c3e50;">Scheidung</div>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button id="complete-szenario" class="btn-next">Weiter zu Familie</button>
+                </div>
+            </section>
+
+            <section id="familie" class="card locked">
+                <div class="blur-overlay">
+                    <div class="lock-message">
+                        <span class="lock-icon">🔒</span>
+                        <p>Bitte wählen Sie zuerst ein Szenario.</p>
+                    </div>
+                </div>
                 <div class="card-header">
                     <h2>Familienkonstellation</h2>
                     <p class="subtitle">Erfassen Sie alle relevanten Personen.</p>
@@ -35,6 +67,13 @@
                         <div class="form-group">
                             <label for="name-input">Vorname / Name</label>
                             <input type="text" id="name-input" placeholder="z.B. Anna Müller">
+                        </div>
+                        <div class="form-group">
+                            <label for="status-select">Status</label>
+                            <select id="status-select" class="dropdown-select">
+                                <option value="Lebend" selected>Lebend</option>
+                                <option value="Verstorben">Verstorben</option>
+                            </select>
                         </div>
                         
                         <div class="form-group">
@@ -111,7 +150,72 @@
                 </div>
 
                 <div class="card-footer">
-                    <button id="complete-vermoegen" class="btn-next" disabled>Ergebnis anzeigen</button>
+                    <button id="complete-vermoegen" class="btn-next" disabled>Weiter zu Güterrecht</button>
+                </div>
+            </section>
+
+            <section id="gueterrecht" class="card locked">
+                <div class="blur-overlay">
+                    <div class="lock-message">
+                        <span class="lock-icon">🔒</span>
+                        <p>Bitte schließen Sie zuerst den Schritt "Vermögen" ab.</p>
+                    </div>
+                </div>
+
+                <div class="card-header">
+                    <h2>Güterrechtliche Auseinandersetzung</h2>
+                    <p class="subtitle">Eigengut und Errungenschaft erfassen</p>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group" style="max-width:320px; margin-bottom:20px;">
+                        <label for="gueterstand-select">Güterstand</label>
+                        <select id="gueterstand-select" class="dropdown-select">
+                            <option value="errungenschaft" selected>Errungenschaftsbeteiligung</option>
+                            <option value="zugewinngemeinschaft">Zugewinngemeinschaft</option>
+                        </select>
+                    </div>
+                    <div class="info-box" style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid #3498db;">
+                        <p style="margin:0; color:#2c3e50;">Tragen Sie die Werte beider Ehepartner ein. Diese Basis wird für Scheidung oder Todesfall verwendet.</p>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
+                        <div class="form-group">
+                            <label for="eigengut-erblasser">Eigengut Erblasser (CHF)</label>
+                            <input type="number" id="eigengut-erblasser" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="errungenschaft-erblasser">Errungenschaft Erblasser (CHF)</label>
+                            <input type="number" id="errungenschaft-erblasser" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="eigengut-partner">Eigengut Partner (CHF)</label>
+                            <input type="number" id="eigengut-partner" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="errungenschaft-partner">Errungenschaft Partner (CHF)</label>
+                            <input type="number" id="errungenschaft-partner" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div id="vorsorge-container" style="margin-top:30px; border-top:1px solid #eee; padding-top:20px; display:none;">
+                        <h3 style="font-size:1.1rem; color:#2c3e50; margin-bottom:15px;">Berufliche Vorsorge (Pensionskasse)</h3>
+                        <p style="font-size:0.9rem; color:#7f8c8d; margin-bottom:15px;">Geben Sie die während der Ehe erworbenen Austrittsleistungen an.</p>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
+                            <div class="form-group">
+                                <label for="pk-erblasser">Pensionskasse Erblasser (CHF)</label>
+                                <input type="number" id="pk-erblasser" placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="pk-partner">Pensionskasse Partner (CHF)</label>
+                                <input type="number" id="pk-partner" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button id="complete-gueterrecht" class="btn-next">Weiter zum Ergebnis</button>
                 </div>
             </section>
 
@@ -123,13 +227,12 @@
                 </div>
 
                 <div class="card-header">
-                    <h2>Resultat (Gesetzliche Erbfolge)</h2>
-                    <p class="subtitle">Zusammenfassung der Erbteilung nach ZGB</p>
+                    <h2>Resultat</h2>
+                    <p class="subtitle">Berechnungsergebnis</p>
                 </div>
 
                 <div class="card-body">
-                    <div id="ergebnis-content" class="result-box">
-                    </div>
+                    <div id="ergebnis-content" class="result-box"></div>
                 </div>
 
                 <div class="card-footer">
