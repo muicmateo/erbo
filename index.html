@@ -68,6 +68,13 @@
                             <label for="name-input">Vorname / Name</label>
                             <input type="text" id="name-input" placeholder="z.B. Anna Müller">
                         </div>
+                        <div class="form-group">
+                            <label for="status-select">Status</label>
+                            <select id="status-select" class="dropdown-select">
+                                <option value="Lebend" selected>Lebend</option>
+                                <option value="Verstorben">Verstorben</option>
+                            </select>
+                        </div>
                         
                         <div class="form-group">
                             <label for="beziehung-select">Beziehung zum Erblasser</label>
@@ -161,6 +168,13 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="form-group" style="max-width:320px; margin-bottom:20px;">
+                        <label for="gueterstand-select">Güterstand</label>
+                        <select id="gueterstand-select" class="dropdown-select">
+                            <option value="errungenschaft" selected>Errungenschaftsbeteiligung</option>
+                            <option value="zugewinngemeinschaft">Zugewinngemeinschaft</option>
+                        </select>
+                    </div>
                     <div class="info-box" style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid #3498db;">
                         <p style="margin:0; color:#2c3e50;">Tragen Sie die Werte beider Ehepartner ein. Diese Basis wird für Scheidung oder Todesfall verwendet.</p>
                     </div>

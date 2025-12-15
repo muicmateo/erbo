@@ -88,6 +88,7 @@ completeSzenarioBtn.addEventListener('click', () => {
 
 // ========== 1. FAMILIE ==========
 const nameInput = document.getElementById('name-input');
+const statusSelect = document.getElementById('status-select');
 const beziehungSelect = document.getElementById('beziehung-select');
 const familienListe = document.getElementById('familien-liste');
 const addFamilyBtn = document.querySelector('#familie .add-button');
@@ -132,18 +133,20 @@ function checkFamilieStatus() {
 addFamilyBtn.addEventListener('click', () => {
     const name = nameInput.value.trim();
     const beziehung = beziehungSelect.value;
+    const status = statusSelect.value || 'Lebend';
     
     if (!name || !beziehung) {
         alert('Bitte Name und Beziehung angeben.');
         return;
     }
     
-    familienMitglieder.push({ name, beziehung });
+    familienMitglieder.push({ name, beziehung, status });
     renderFamilienListe();
     checkFamilieStatus();
     
     nameInput.value = '';
     beziehungSelect.value = '';
+    statusSelect.value = 'Lebend';
 });
 
 completeFamilieBtn.addEventListener('click', () => {
