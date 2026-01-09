@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERBO - Güter- und Erbrecht Calculator</title>
+    <title>ERBO - Rechner</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,97 +12,83 @@
         <header class="header">
             <div class="logo-area">
                 <div class="logo-box">ERBO</div>
-                <h1 class="main-title">Güter- & Erbrecht Rechner</h1>
+                <h1 class="main-title">Rechner: Güterstand & Erbe</h1>
             </div>
+            
+            <div class="scenario-selector-container">
+                <label class="scenario-option selected" id="opt-tod">
+                    <input type="radio" name="szenario" value="tod" checked onchange="switchScenario('tod')">
+                    <span class="icon">✝️</span>
+                    <span class="text">Todesfall (Erbe)</span>
+                </label>
+                <label class="scenario-option" id="opt-scheidung">
+                    <input type="radio" name="szenario" value="scheidung" onchange="switchScenario('scheidung')">
+                    <span class="icon">💔</span>
+                    <span class="text">Scheidung</span>
+                </label>
+            </div>
+
             <div class="step-indicator">
-                <div class="step active" data-step="szenario">1. Szenario</div>
+                <div class="step active" id="step-nav-1" data-step="familie">1. Familie</div>
                 <div class="line"></div>
-                <div class="step" data-step="familie">2. Familie</div>
+                <div class="step" id="step-nav-2" data-step="vermoegen">2. Vermögen</div>
                 <div class="line"></div>
-                <div class="step" data-step="vermoegen">3. Vermögen</div>
-                <div class="line"></div>
-                <div class="step" data-step="gueterrecht">4. Güterrecht</div>
-                <div class="line"></div>
-                <div class="step" data-step="ergebnis">5. Ergebnis</div>
+                <div class="step" id="step-nav-3" data-step="ergebnis">3. Ergebnis</div>
             </div>
         </header>
 
         <main class="main-content">
-            <section id="szenario" class="card active">
-                <div class="card-header">
-                    <h2>Szenario wählen</h2>
-                    <p class="subtitle">Bitte wählen Sie den Anlass der Berechnung.</p>
-                </div>
-                <div class="card-body">
-                    <div class="scenario-options" style="display:flex; gap:20px; justify-content:center; margin: 20px 0;">
-                        <button type="button" class="scenario-card selected" data-value="death" style="flex:1; max-width:200px; padding:20px; border:2px solid #3498db; border-radius:8px; background:#f0f7ff; cursor:pointer; text-align:center; transition:all 0.2s;">
-                            <div style="font-size:2.5rem; margin-bottom:10px;">⚰️</div>
-                            <div style="font-weight:bold; color:#2c3e50;">Todesfall</div>
-                        </button>
-                        <button type="button" class="scenario-card" data-value="divorce" style="flex:1; max-width:200px; padding:20px; border:2px solid #e0e6ed; border-radius:8px; background:white; cursor:pointer; text-align:center; transition:all 0.2s;">
-                            <div style="font-size:2.5rem; margin-bottom:10px;">💔</div>
-                            <div style="font-weight:bold; color:#2c3e50;">Scheidung</div>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <button id="complete-szenario" class="btn-next">Weiter zu Familie</button>
-                </div>
-            </section>
-
-            <section id="familie" class="card locked">
-                <div class="blur-overlay">
-                    <div class="lock-message">
-                        <span class="lock-icon">🔒</span>
-                        <p>Bitte wählen Sie zuerst ein Szenario.</p>
-                    </div>
-                </div>
+            <section id="familie" class="card active">
                 <div class="card-header">
                     <h2>Familienkonstellation</h2>
-                    <p class="subtitle">Erfassen Sie alle relevanten Personen.</p>
+                    <p class="subtitle">Erfassen Sie alle relevanten Personen (auch Verstorbene, wenn sie Nachkommen haben).</p>
                 </div>
                 
                 <div class="card-body split-view">
                     <div class="input-panel">
                         <div class="form-group">
-                            <label for="name-input">Vorname / Name</label>
-                            <input type="text" id="name-input" placeholder="z.B. Anna Müller">
-                        </div>
-                        <div class="form-group">
-                            <label for="status-select">Status</label>
-                            <select id="status-select" class="dropdown-select">
-                                <option value="Lebend" selected>Lebend</option>
-                                <option value="Verstorben">Verstorben</option>
-                            </select>
+                            <label>Name</label>
+                            <input type="text" id="name-input" placeholder="z.B. Anna">
                         </div>
                         
                         <div class="form-group">
-                            <label for="beziehung-select">Beziehung zum Erblasser</label>
-                            <select id="beziehung-select" class="dropdown-select">
+                            <label>Beziehung zum Erblasser</label>
+                            <select id="beziehung-select" class="dropdown-select" onchange="toggleStammInput()">
                                 <option value="" disabled selected>Bitte wählen...</option>
-                                <option value="Ehepartner">Ehepartner / Eingetragener Partner</option>
-                                <option value="Kind">Kind (Nachkomme)</option>
+                                <option value="Ehepartner">Ehepartner</option>
+                                <option value="Kind">Kind (Sohn/Tochter)</option>
+                                <option value="Enkel">Enkel / Enkelin</option>
+                                <option value="Urenkel">Urenkel / Urenkelin</option>
                                 <option value="Elternteil">Elternteil</option>
                                 <option value="Geschwister">Geschwister</option>
-                                <option value="Enkel">Enkel</option>
-                                <option value="Elternteil">Elternteil</option>
-                                <option value="Geschwister">Geschwister</option>
+                                <option value="NichteNeffe">Nichte / Neffe</option>
                                 <option value="Grosseltern">Grosseltern</option>
-                                <option value="Onkel/Tante">Onkel / Tante</option>
+                                <option value="OnkelTante">Onkel / Tante</option>
                                 <option value="Cousin">Cousin / Cousine</option>
-                                <option value="Anderer">Andere Person</option>
                             </select>
                         </div>
 
-                        <button class="btn-primary add-button">
-                            <span class="plus-icon">+</span> Hinzufügen
-                        </button>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status-select" class="dropdown-select">
+                                <option value="lebend" selected>Lebend</option>
+                                <option value="verstorben">Bereits verstorben</option>
+                            </select>
+                            <small style="color:#7f8c8d; font-size:0.8rem">Verstorbene erben nicht, sind aber wichtig für die Stammfolge.</small>
+                        </div>
+
+                        <div class="form-group hidden" id="stamm-group">
+                            <label>Kind von wem? (Name des Elternteils)</label>
+                            <input type="text" id="stamm-input" placeholder="z.B. Name des Sohnes/Tochter">
+                        </div>
+
+                        <button class="btn-primary add-button">Hinzufügen</button>
                     </div>
 
                     <div class="display-panel">
-                        <div class="panel-header">Erfasste Personen</div>
+                        <div class="panel-header">Verwandte</div>
                         <div id="familien-liste" class="list-container empty-state">
-                            <span class="placeholder-text">Noch keine Personen hinzugefügt</span>
+                            <span class="placeholder-text">Keine Personen</span>
                         </div>
                     </div>
                 </div>
@@ -112,136 +98,76 @@
                 </div>
             </section>
 
-            <section id="vermoegen" class="card locked">
-                <div class="blur-overlay">
-                    <div class="lock-message">
-                        <span class="lock-icon">🔒</span>
-                        <p>Bitte schließen Sie zuerst den Schritt "Familie" ab.</p>
+            <section id="scheidung-info" class="card hidden">
+                <div class="card-body" style="text-align:center; padding: 2rem;">
+                    <h3 style="color: #e67e22;">Modus: Scheidung</h3>
+                    <p style="color: #7f8c8d;">Familiendaten sind hier nicht nötig.</p>
+                    <div style="margin-top:20px;">
+                        <button class="btn-next" onclick="forceNextStep()">Direkt zur Vermögensaufteilung</button>
                     </div>
                 </div>
+            </section>
+
+            <section id="vermoegen" class="card locked">
+                <div class="blur-overlay"><div class="lock-message">🔒 Zuerst Schritt 1 abschließen</div></div>
 
                 <div class="card-header">
                     <h2>Vermögenswerte</h2>
-                    <p class="subtitle">Listen Sie alle Aktiven und Passiven auf.</p>
+                    <p class="subtitle" id="asset-subtitle">Erfassen Sie alle Werte.</p>
                 </div>
 
                 <div class="card-body split-view">
                     <div class="input-panel">
                         <div class="form-group">
-                            <label for="vermoegen-art">Bezeichnung</label>
-                            <input type="text" id="vermoegen-art" placeholder="z.B. Einfamilienhaus">
+                            <label>Bezeichnung</label>
+                            <input type="text" id="vermoegen-art" placeholder="z.B. Haus, Konto">
                         </div>
                         <div class="form-group">
-                            <label for="vermoegen-wert">Wert (CHF)</label>
+                            <label>Wert (CHF)</label>
                             <input type="number" id="vermoegen-wert" placeholder="0.00">
                         </div>
-                        <button class="btn-primary add-button">
-                            <span class="plus-icon">+</span> Wert hinzufügen
-                        </button>
+                        
+                        <div id="asset-details-container">
+                            <div class="form-group">
+                                <label>Eigentümer</label>
+                                <select id="vermoegen-besitzer" class="dropdown-select">
+                                    <option value="A">Partner A (Ich / Erblasser)</option>
+                                    <option value="B">Partner B (Ehepartner)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Güterstand-Kategorie</label>
+                                <select id="vermoegen-typ" class="dropdown-select">
+                                    <option value="Errungenschaft">Errungenschaft (Gemeinsam erwirtschaftet)</option>
+                                    <option value="Eigengut">Eigengut (Eingebracht/Geerbt)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary add-button">Wert hinzufügen</button>
                     </div>
 
                     <div class="display-panel">
-                        <div class="panel-header">Vermögensübersicht</div>
+                        <div class="panel-header">Liste der Werte</div>
                         <div id="vermoegen-liste" class="list-container empty-state">
-                            <span class="placeholder-text">Keine Werte erfasst</span>
-                        </div>
-                        <div id="asset-bar-container" class="bar-container"></div>
-                    </div>
-                </div>
-
-                <div class="card-footer">
-                    <button id="complete-vermoegen" class="btn-next" disabled>Weiter zu Güterrecht</button>
-                </div>
-            </section>
-
-            <section id="gueterrecht" class="card locked">
-                <div class="blur-overlay">
-                    <div class="lock-message">
-                        <span class="lock-icon">🔒</span>
-                        <p>Bitte schließen Sie zuerst den Schritt "Vermögen" ab.</p>
-                    </div>
-                </div>
-
-                <div class="card-header">
-                    <h2>Güterrechtliche Auseinandersetzung</h2>
-                    <p class="subtitle">Eigengut und Errungenschaft erfassen</p>
-                </div>
-
-                <div class="card-body">
-                    <div class="form-group" style="max-width:320px; margin-bottom:20px;">
-                        <label for="gueterstand-select">Güterstand</label>
-                        <select id="gueterstand-select" class="dropdown-select">
-                            <option value="errungenschaft" selected>Errungenschaftsbeteiligung</option>
-                            <option value="zugewinngemeinschaft">Zugewinngemeinschaft</option>
-                        </select>
-                    </div>
-                    <div class="info-box" style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px; border-left:4px solid #3498db;">
-                        <p style="margin:0; color:#2c3e50;">Tragen Sie die Werte beider Ehepartner ein. Diese Basis wird für Scheidung oder Todesfall verwendet.</p>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
-                        <div class="form-group">
-                            <label for="eigengut-erblasser">Eigengut Erblasser (CHF)</label>
-                            <input type="number" id="eigengut-erblasser" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label for="errungenschaft-erblasser">Errungenschaft Erblasser (CHF)</label>
-                            <input type="number" id="errungenschaft-erblasser" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label for="eigengut-partner">Eigengut Partner (CHF)</label>
-                            <input type="number" id="eigengut-partner" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label for="errungenschaft-partner">Errungenschaft Partner (CHF)</label>
-                            <input type="number" id="errungenschaft-partner" placeholder="0.00">
-                        </div>
-                    </div>
-
-                    <div id="vorsorge-container" style="margin-top:30px; border-top:1px solid #eee; padding-top:20px; display:none;">
-                        <h3 style="font-size:1.1rem; color:#2c3e50; margin-bottom:15px;">Berufliche Vorsorge (Pensionskasse)</h3>
-                        <p style="font-size:0.9rem; color:#7f8c8d; margin-bottom:15px;">Geben Sie die während der Ehe erworbenen Austrittsleistungen an.</p>
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px;">
-                            <div class="form-group">
-                                <label for="pk-erblasser">Pensionskasse Erblasser (CHF)</label>
-                                <input type="number" id="pk-erblasser" placeholder="0.00">
-                            </div>
-                            <div class="form-group">
-                                <label for="pk-partner">Pensionskasse Partner (CHF)</label>
-                                <input type="number" id="pk-partner" placeholder="0.00">
-                            </div>
+                            <span class="placeholder-text">Leer</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="card-footer">
-                    <button id="complete-gueterrecht" class="btn-next">Weiter zum Ergebnis</button>
+                    <button id="complete-vermoegen" class="btn-next" disabled>Ergebnis anzeigen</button>
                 </div>
             </section>
 
             <section id="ergebnis" class="card locked">
-                <div class="blur-overlay">
-                    <div class="lock-message">
-                        <span class="lock-icon">🔒</span>
-                    </div>
-                </div>
-
-                <div class="card-header">
-                    <h2>Resultat</h2>
-                    <p class="subtitle">Berechnungsergebnis</p>
-                </div>
-
-                <div class="card-body">
-                    <div id="ergebnis-content" class="result-box"></div>
-                </div>
-
-                <div class="card-footer">
-                    <button class="btn-secondary" onclick="location.reload()">Neuberechnung starten</button>
-                </div>
+                <div class="blur-overlay"><div class="lock-message">🔒</div></div>
+                <div class="card-header"><h2 id="result-title">Ergebnis</h2></div>
+                <div class="card-body"><div id="ergebnis-content" class="result-box"></div></div>
+                <div class="card-footer"><button class="btn-secondary" onclick="location.reload()">Neu starten</button></div>
             </section>
         </main>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
