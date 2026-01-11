@@ -1,6 +1,39 @@
 // ========== DATA ==========
 let familienMitglieder = []; 
 let vermoegenswerte = [];
+let teilungGewaehlt = false;
+
+// Test helper functions to set state
+function resetVermoegenswerte(newArray = []) {
+    vermoegenswerte = newArray;
+}
+
+function resetFamilienMitglieder(newArray = []) {
+    familienMitglieder = newArray;
+}
+
+
+// Helper to format currency
+const formatCHF = (value) => {
+    return new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(value);
+};
+
+// Only initialize DOM-dependent code in browser environment
+if (typeof module === 'undefined' || !module.exports) {
+    initializeApp();
+}
+
+function initializeApp() {
+// Elements
+const sections = {
+    familie: document.getElementById('familie'),
+    vermoegen: document.getElementById('vermoegen'),
+    berechnung: document.getElementById('berechnung'),
+    ergebnis: document.getElementById('ergebnis')
+};
+
+// Helper to format currency
+const formatCHF = (value) => {
 let currentScenario = 'tod'; 
 
 // ========== HELPER ==========
@@ -239,8 +272,86 @@ completeAssetBtn.addEventListener('click', () => {
     unlockStep('ergebnis');
     document.getElementById('ergebnis').classList.add('active');
     calculateResult();
+
+function checkVermoegenStatus() {
+    if (typeof document !== 'undefined') {
+        const completeVermoegen = document.getElementById('complete-vermoegen');
+        if (completeVermoegen) completeVermoegen.disabled = vermoegenswerte.length < 1;
+    }
+}
+
+completeVermoegen.addEventListener('click', () => {
+    unlockNextSection('vermoegen', 'berechnung');
+    completeVermoegen.innerHTML = 'Erledigt ✓';
 });
 
+
+// ========== 3. BERECHNUNG ==========
+const completeBerechnung = document.getElementById('complete-berechnung');
+const radioButtons = document.querySelectorAll('input[name="teilung"]');
+
+radioButtons.forEach(radio => {
+    radio.addEventListener('change', () => {
+        teilungGewaehlt = true;
+        completeBerechnung.disabled = false;
+    });
+});
+
+completeBerechnung.addEventListener('click', () => {
+    generateErgebnis();
+    unlockNextSection('berechnung', 'ergebnis');
+});
+
+} // End of initializeApp()
+
+// Helper functions that need to be accessible from both browser and test environments
+function renderFamilienListe() {
+    if (typeof document === 'undefined') return;
+    const familienListe = document.getElementById('familien-liste');
+    if (!familienListe) return;
+    
+    familienListe.innerHTML = '';
+    if (familienMitglieder.length === 0) {
+        familienListe.classList.add('empty-state');
+        familienListe.innerHTML = '<span class="placeholder-text">Noch keine Personen hinzugefügt</span>';
+        return;
+    }
+    
+    familienListe.classList.remove('empty-state');
+    familienMitglieder.forEach((person, index) => {
+        const item = document.createElement('div');
+        item.className = 'liste-item';
+        item.innerHTML = `
+            <div>
+                <strong>${person.name}</strong>
+                <br><small style="color:#7f8c8d">${person.beziehung}</small>
+            </div>
+            <button onclick="removeFamilie(${index})" style="color:red; background:none;">&times;</button>
+        `;
+        familienListe.appendChild(item);
+    });
+}
+
+function removeFamilie(index) {
+    familienMitglieder.splice(index, 1);
+    renderFamilienListe();
+    checkFamilieStatus();
+}
+
+function checkFamilieStatus() {
+    // Require at least 1 person to proceed
+    if (typeof document !== 'undefined') {
+        const completeFamilie = document.getElementById('complete-familie');
+        if (completeFamilie) completeFamilie.disabled = familienMitglieder.length < 1;
+    }
+}
+
+function checkVermoegenStatus() {
+    if (typeof document !== 'undefined') {
+        const completeVermoegen = document.getElementById('complete-vermoegen');
+        if (completeVermoegen) completeVermoegen.disabled = vermoegenswerte.length < 1;
+    }
+}
 
 // ========== SCHRITT 3: BERECHNUNG ==========
 function calculateResult() {
