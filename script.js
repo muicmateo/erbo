@@ -272,17 +272,6 @@ completeAssetBtn.addEventListener('click', () => {
     unlockStep('ergebnis');
     document.getElementById('ergebnis').classList.add('active');
     calculateResult();
-
-function checkVermoegenStatus() {
-    if (typeof document !== 'undefined') {
-        const completeVermoegen = document.getElementById('complete-vermoegen');
-        if (completeVermoegen) completeVermoegen.disabled = vermoegenswerte.length < 1;
-    }
-}
-
-completeVermoegen.addEventListener('click', () => {
-    unlockNextSection('vermoegen', 'berechnung');
-    completeVermoegen.innerHTML = 'Erledigt ✓';
 });
 
 
@@ -302,59 +291,7 @@ completeBerechnung.addEventListener('click', () => {
     unlockNextSection('berechnung', 'ergebnis');
 });
 
-} // End of initializeApp()
-
-// Helper functions that need to be accessible from both browser and test environments
-function renderFamilienListe() {
-    if (typeof document === 'undefined') return;
-    const familienListe = document.getElementById('familien-liste');
-    if (!familienListe) return;
-    
-    familienListe.innerHTML = '';
-    if (familienMitglieder.length === 0) {
-        familienListe.classList.add('empty-state');
-        familienListe.innerHTML = '<span class="placeholder-text">Noch keine Personen hinzugefügt</span>';
-        return;
-    }
-    
-    familienListe.classList.remove('empty-state');
-    familienMitglieder.forEach((person, index) => {
-        const item = document.createElement('div');
-        item.className = 'liste-item';
-        item.innerHTML = `
-            <div>
-                <strong>${person.name}</strong>
-                <br><small style="color:#7f8c8d">${person.beziehung}</small>
-            </div>
-            <button onclick="removeFamilie(${index})" style="color:red; background:none;">&times;</button>
-        `;
-        familienListe.appendChild(item);
-    });
-}
-
-function removeFamilie(index) {
-    familienMitglieder.splice(index, 1);
-    renderFamilienListe();
-    checkFamilieStatus();
-}
-
-function checkFamilieStatus() {
-    // Require at least 1 person to proceed
-    if (typeof document !== 'undefined') {
-        const completeFamilie = document.getElementById('complete-familie');
-        if (completeFamilie) completeFamilie.disabled = familienMitglieder.length < 1;
-    }
-}
-
-function checkVermoegenStatus() {
-    if (typeof document !== 'undefined') {
-        const completeVermoegen = document.getElementById('complete-vermoegen');
-        if (completeVermoegen) completeVermoegen.disabled = vermoegenswerte.length < 1;
-    }
-}
-
-// ========== SCHRITT 3: BERECHNUNG ==========
-function calculateResult() {
+// ========== DUPLICATE FUNCTIONS REMOVED - SEE END OF FILE ==========
     const container = document.getElementById('ergebnis-content');
     container.innerHTML = '';
 
@@ -528,4 +465,40 @@ function calculateResult() {
     });
 
     container.innerHTML = html;
+}
+
+} // End of initializeApp()
+
+// Helper functions for testing
+function removeAsset(i) {
+    if (i < 0 || i >= vermoegenswerte.length) return;
+    vermoegenswerte.splice(i, 1);
+    // Only call DOM function if in browser
+    if (typeof renderVermoegen !== 'undefined') renderVermoegen();
+}
+
+function deleteAssetByType(type, all = false) {
+    if (!type) return;
+    const needle = type.trim().toLowerCase();
+    if (all) {
+        vermoegenswerte = vermoegenswerte.filter(v => v.art.trim().toLowerCase() !== needle);
+    } else {
+        const idx = vermoegenswerte.findIndex(v => v.art.trim().toLowerCase() === needle);
+        if (idx !== -1) vermoegenswerte.splice(idx, 1);
+    }
+    // Only call DOM function if in browser
+    if (typeof renderVermoegen !== 'undefined') renderVermoegen();
+}
+
+// Export functions for testing (Node.js environment)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        formatCHF,
+        deleteAssetByType,
+        removeAsset,
+        resetVermoegenswerte,
+        resetFamilienMitglieder,
+        getVermoegenswerte: () => vermoegenswerte,
+        getFamilienMitglieder: () => familienMitglieder
+    };
 }
