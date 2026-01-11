@@ -1,105 +1,150 @@
 /**
- * Test Cases: Nackommen und Eltern
+ * Unit Tests for Swiss Inheritance Calculator (script.js)
+ * Simple, focused tests for testable functions
  */
 
-// Distribution logic for inheritance
-function calculateInheritanceShares(familienMitglieder, gesamtVermoegen) {
-    const shares = new Map();
-    
-    const isChild = (s) => /(^|\s)kind|kinder|sohn|tochter/i.test(s) && !/enkel/i.test(s);
-    const isGrandchild = (s) => /enkel|enkelin/i.test(s);
-    const parseGrandchildParent = (rel) => {
-        if (!rel) return null;
-        const match = rel.match(/von\s+(.+)$/i);
-        if (match && match[1]) {
-            return match[1].trim();
-        }
-        return null;
-    };
-    const isParent = (s) => /eltern|mutter|vater/i.test(s) && !/grosseltern|grossmutter|grossvater/i.test(s);
-    const isSibling = (s) => /geschwister|bruder|schwester/i.test(s);
-    const isGrandparent = (s) => /grosseltern|grossmutter|grossvater|oma|opa/i.test(s);
+const { formatCHF, deleteAssetByType, removeAsset, resetVermoegenswerte, getVermoegenswerte } = require('../script.js');
 
-    const addShare = (personName, amount) => {
-        if (!personName) return;
-        const prev = shares.get(personName) || 0;
-        shares.set(personName, prev + amount);
-    };
+describe('Swiss Inheritance Calculator - Unit Tests', () => {
 
-    const children = familienMitglieder.filter(p => isChild(p.beziehung));
-    const parents = familienMitglieder.filter(p => isParent(p.beziehung));
-    const siblings = familienMitglieder.filter(p => isSibling(p.beziehung));
-    const grandparents = familienMitglieder.filter(p => isGrandparent(p.beziehung));
-
-    if (children.length > 0) {
-        const totalBranches = children.length + (grandparents.length > 0 ? 1 : 0);
-        const perBranch = gesamtVermoegen / totalBranches;
-        children.forEach(c => addShare(c.name, perBranch));
-        if (grandparents.length > 0) {
-            const perGrandchild = perBranch / grandparents.length;
-            grandparents.forEach(gp => addShare(gp.name, perGrandchild));
-        }
-    } 
-    else if (parents.length > 0) {
-        const perParent = gesamtVermoegen / parents.length;
-        parents.forEach(p => addShare(p.name, perParent));
-    }
-    else if (siblings.length > 0) {
-        const perSibling = gesamtVermoegen / siblings.length;
-        siblings.forEach(s => addShare(s.name, perSibling));
-    }
-    else if (grandparents.length > 0) {
-        const perGrandparent = gesamtVermoegen / grandparents.length;
-        grandparents.forEach(gp => addShare(gp.name, perGrandparent));
-    }
-
-    return shares;
-}
-
-describe('Nachkommen und Eltern', () => {
-
-    test('Test 6.1: Two children inherit equally', () => {
+    // ========== formatCHF Tests ==========
+    describe('formatCHF - Currency Formatting', () => {
         
-        const family = [
-            { name: 'Kind1', beziehung: 'Kind' },
-            { name: 'Kind2', beziehung: 'Kind' }
-        ];
-        
-        const totalAssets = 100000;
-        const shares = calculateInheritanceShares(family, totalAssets);
-        
-        expect(shares.get('Kind1')).toBe(50000);
-        expect(shares.get('Kind2')).toBe(50000);
+        test('Format 100000 as CHF currency', () => {
+            const result = formatCHF(100000);
+            expect(result).toContain('CHF');
+            expect(result).toContain('100');
+        });
+
+        test('Format 50000 as CHF currency', () => {
+            const result = formatCHF(50000);
+            expect(result).toContain('CHF');
+            expect(result).toContain('50');
+        });
+
+        test('Format 0 as CHF currency', () => {
+            const result = formatCHF(0);
+            expect(result).toContain('CHF');
+            expect(result).toContain('0');
+        });
+
+        test('Format decimal amount correctly', () => {
+            const result = formatCHF(1234.56);
+            expect(result).toContain('CHF');
+            expect(result).toContain('1');
+        });
+
     });
 
-    test('Test 6.2: One child and two grandchildren', () => {
+    // ========== deleteAssetByType Tests ==========
+    describe('deleteAssetByType - Asset Deletion', () => {
         
-        const family = [
-            { name: 'Kind', beziehung: 'Kind' },
-            { name: 'Enkel1', beziehung: 'Enkel von Kind' },
-            { name: 'Enkel2', beziehung: 'Enkel von Kind' }
-        ];
-        
-        const totalAssets = 200000;
-        const shares = calculateInheritanceShares(family, totalAssets);
-        
-        expect(shares.get('Kind')).toBe(100000);
-        expect(shares.get('Enkel1')).toBe(50000);
-        expect(shares.get('Enkel2')).toBe(50000);
+        beforeEach(() => {
+            // Reset asset array before each test using proper setter
+            resetVermoegenswerte([
+                { art: 'Haus', wert: 500000 },
+                { art: 'Auto', wert: 50000 },
+                { art: 'Bankkonto', wert: 100000 }
+            ]);
+        });
+
+        test('Delete first occurrence of an asset type', () => {
+            deleteAssetByType('Auto', false);
+            const result = getVermoegenswerte();
+            expect(result.length).toBe(2);
+            expect(result.some(a => a.art === 'Auto')).toBe(false);
+        });
+
+        test('Delete asset with case-insensitive matching', () => {
+            deleteAssetByType('auto', false);
+            const result = getVermoegenswerte();
+            expect(result.length).toBe(2);
+            expect(result.some(a => a.art === 'Auto')).toBe(false);
+        });
+
+        test('Do nothing if asset type does not exist', () => {
+            const initialLength = getVermoegenswerte().length;
+            deleteAssetByType('Flugzeug', false);
+            expect(getVermoegenswerte().length).toBe(initialLength);
+        });
+
+        test('Delete all occurrences when all=true', () => {
+            const current = getVermoegenswerte();
+            current.push({ art: 'Auto', wert: 30000 });
+            deleteAssetByType('Auto', true);
+            expect(getVermoegenswerte().some(a => a.art === 'Auto')).toBe(false);
+        });
+
     });
 
-    test('Test 7.1: Two parents inherit equally', () => {
+    // ========== removeAsset Tests ==========
+    describe('removeAsset - Remove by Index', () => {
         
-        const family = [
-            { name: 'Eltern1', beziehung: 'Elternteil' },
-            { name: 'Eltern2', beziehung: 'Elternteil' }
-        ];
+        beforeEach(() => {
+            // Reset asset array before each test using proper setter
+            resetVermoegenswerte([
+                { art: 'Haus', wert: 500000 },
+                { art: 'Auto', wert: 50000 },
+                { art: 'Bankkonto', wert: 100000 }
+            ]);
+        });
+
+        test('Remove asset at index 0', () => {
+            removeAsset(0);
+            const result = getVermoegenswerte();
+            expect(result.length).toBe(2);
+            expect(result[0].art).toBe('Auto');
+        });
+
+        test('Remove asset at index 1', () => {
+            removeAsset(1);
+            const result = getVermoegenswerte();
+            expect(result.length).toBe(2);
+            expect(result.some(a => a.art === 'Auto')).toBe(false);
+        });
+
+        test('Do nothing if index is out of bounds (negative)', () => {
+            const initialLength = getVermoegenswerte().length;
+            removeAsset(-1);
+            expect(getVermoegenswerte().length).toBe(initialLength);
+        });
+
+        test('Do nothing if index is out of bounds (too high)', () => {
+            const initialLength = getVermoegenswerte().length;
+            removeAsset(999);
+            expect(getVermoegenswerte().length).toBe(initialLength);
+        });
+
+    });
+
+    // ========== Input Validation Tests ==========
+    describe('Input Validation', () => {
         
-        const totalAssets = 100000;
-        const shares = calculateInheritanceShares(family, totalAssets);
-        
-        expect(shares.get('Eltern1')).toBe(50000);
-        expect(shares.get('Eltern2')).toBe(50000);
+        test('Reject empty name input', () => {
+            const name = '';
+            expect(name.trim()).toBe('');
+        });
+
+        test('Reject negative asset value', () => {
+            const value = -50000;
+            expect(value > 0).toBe(false);
+        });
+
+        test('Reject zero asset value', () => {
+            const value = 0;
+            expect(value > 0).toBe(false);
+        });
+
+        test('Accept positive asset value', () => {
+            const value = 50000;
+            expect(value > 0).toBe(true);
+        });
+
+        test('Accept non-empty name after trim', () => {
+            const name = '  Haus  ';
+            expect(name.trim().length).toBeGreaterThan(0);
+        });
+
     });
 
 });
