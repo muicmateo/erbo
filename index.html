@@ -37,52 +37,62 @@
             </div>
         </header>
 
-        <main class="main-content">
+<main class="main-content">
             <section id="familie" class="card active">
                 <div class="card-header">
                     <h2>Familienkonstellation</h2>
-                    <p class="subtitle">Erfassen Sie alle relevanten Personen (auch Verstorbene, wenn sie Nachkommen haben).</p>
+                    <p class="subtitle">Erfassen Sie alle relevanten Personen.</p>
                 </div>
                 
                 <div class="card-body split-view">
                     <div class="input-panel">
-                        <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" id="name-input" placeholder="z.B. Anna">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Beziehung zum Erblasser</label>
-                            <select id="beziehung-select" class="dropdown-select" onchange="toggleStammInput()">
-                                <option value="" disabled selected>Bitte wählen...</option>
-                                <option value="Ehepartner">Ehepartner</option>
-                                <option value="Kind">Kind (Sohn/Tochter)</option>
-                                <option value="Enkel">Enkel / Enkelin</option>
-                                <option value="Urenkel">Urenkel / Urenkelin</option>
-                                <option value="Elternteil">Elternteil</option>
-                                <option value="Geschwister">Geschwister</option>
-                                <option value="NichteNeffe">Nichte / Neffe</option>
-                                <option value="Grosseltern">Grosseltern</option>
-                                <option value="OnkelTante">Onkel / Tante</option>
-                                <option value="Cousin">Cousin / Cousine</option>
-                            </select>
+                        <div id="family-inputs">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="name-input" placeholder="z.B. Anna">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Beziehung zum Erblasser</label>
+                                <select id="beziehung-select" class="dropdown-select" onchange="toggleStammInput()">
+                                    <option value="" disabled selected>Bitte wählen...</option>
+                                    <option value="Ehepartner">Ehepartner</option>
+                                    <option value="Kind">Kind (Sohn/Tochter)</option>
+                                    <option value="Enkel">Enkel / Enkelin</option>
+                                    <option value="Urenkel">Urenkel / Urenkelin</option>
+                                    <option value="Elternteil">Elternteil</option>
+                                    <option value="Geschwister">Geschwister</option>
+                                    <option value="NichteNeffe">Nichte / Neffe</option>
+                                    <option value="Grosseltern">Grosseltern</option>
+                                    <option value="OnkelTante">Onkel / Tante</option>
+                                    <option value="Cousin">Cousin / Cousine</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="status-select" class="dropdown-select">
+                                    <option value="lebend" selected>Lebend</option>
+                                    <option value="verstorben">Bereits verstorben</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group hidden" id="stamm-group">
+                                <label>Kind von wem? (Elternteil)</label>
+                                <input type="text" id="stamm-input" placeholder="Name des Elternteils">
+                            </div>
+
+                            <button class="btn-primary add-button">Hinzufügen</button>
                         </div>
 
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select id="status-select" class="dropdown-select">
-                                <option value="lebend" selected>Lebend</option>
-                                <option value="verstorben">Bereits verstorben</option>
-                            </select>
-                            <small style="color:#7f8c8d; font-size:0.8rem">Verstorbene erben nicht, sind aber wichtig für die Stammfolge.</small>
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="no-family-checkbox">
+                                <span class="checkmark"></span>
+                                <span style="font-weight:600; color:#e67e22;">Keine Verwandten (Erbe an Staat)</span>
+                            </label>
+                            <p style="font-size:0.8rem; color:#7f8c8d; margin-top:5px;">Aktivieren Sie dies, wenn niemand erbberechtigt ist.</p>
                         </div>
-
-                        <div class="form-group hidden" id="stamm-group">
-                            <label>Kind von wem? (Name des Elternteils)</label>
-                            <input type="text" id="stamm-input" placeholder="z.B. Name des Sohnes/Tochter">
-                        </div>
-
-                        <button class="btn-primary add-button">Hinzufügen</button>
                     </div>
 
                     <div class="display-panel">
