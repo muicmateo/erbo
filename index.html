@@ -37,7 +37,7 @@
             </div>
         </header>
 
-<main class="main-content">
+        <main class="main-content">
             <section id="familie" class="card active">
                 <div class="card-header">
                     <h2>Familienkonstellation</h2>
@@ -91,7 +91,6 @@
                                 <span class="checkmark"></span>
                                 <span style="font-weight:600; color:#e67e22;">Keine Verwandten (Erbe an Staat)</span>
                             </label>
-                            <p style="font-size:0.8rem; color:#7f8c8d; margin-top:5px;">Aktivieren Sie dies, wenn niemand erbberechtigt ist.</p>
                         </div>
                     </div>
 
@@ -128,30 +127,40 @@
 
                 <div class="card-body split-view">
                     <div class="input-panel">
+                        <div id="simple-estate-wrapper" style="margin-bottom: 20px; padding-bottom:15px; border-bottom:1px solid #eee;">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="simple-estate-checkbox" onchange="toggleAssetDetails()">
+                                <span class="checkmark"></span>
+                                <span style="font-weight:600;">Das ist bereits die reine Erbmasse</span>
+                            </label>
+                            <p style="font-size:0.8rem; color:#7f8c8d; margin-top:2px; margin-left:30px;">
+                                Keine güterrechtliche Teilung. Alles geht direkt in den Erb-Topf.
+                            </p>
+                        </div>
+
                         <div class="form-group">
                             <label>Bezeichnung</label>
-                            <input type="text" id="vermoegen-art" placeholder="z.B. Haus, Konto">
+                            <input type="text" id="vermoegen-art" placeholder="z.B. Konto, Haus">
                         </div>
                         <div class="form-group">
                             <label>Wert (CHF)</label>
                             <input type="number" id="vermoegen-wert" placeholder="0.00">
                         </div>
                         
-                        <div id="asset-details-container">
-                            <div class="form-group">
-                                <label>Eigentümer</label>
-                                <select id="vermoegen-besitzer" class="dropdown-select">
-                                    <option value="A">Partner A (Ich / Erblasser)</option>
-                                    <option value="B">Partner B (Ehepartner)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Güterstand-Kategorie</label>
-                                <select id="vermoegen-typ" class="dropdown-select">
-                                    <option value="Errungenschaft">Errungenschaft (Gemeinsam erwirtschaftet)</option>
-                                    <option value="Eigengut">Eigengut (Eingebracht/Geerbt)</option>
-                                </select>
-                            </div>
+                        <div id="container-owner" class="form-group">
+                            <label>Eigentümer</label>
+                            <select id="vermoegen-besitzer" class="dropdown-select">
+                                <option value="A">Partner A (Ich / Erblasser)</option>
+                                <option value="B">Partner B (Ehepartner)</option>
+                            </select>
+                        </div>
+
+                        <div id="container-type" class="form-group">
+                            <label>Güterstand-Kategorie</label>
+                            <select id="vermoegen-typ" class="dropdown-select">
+                                <option value="Errungenschaft">Errungenschaft (Gemeinsam erwirtschaftet)</option>
+                                <option value="Eigengut">Eigengut (Eingebracht/Geerbt)</option>
+                            </select>
                         </div>
 
                         <button class="btn-primary add-button">Wert hinzufügen</button>

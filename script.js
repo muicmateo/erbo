@@ -16,6 +16,7 @@ function switchScenario(szenario) {
 
     const sectionFamilie = document.getElementById('familie');
     const sectionInfo = document.getElementById('scheidung-info');
+    const simpleEstateWrapper = document.getElementById('simple-estate-wrapper');
 
     if (szenario === 'scheidung') {
         sectionFamilie.style.display = 'none';
@@ -23,15 +24,21 @@ function switchScenario(szenario) {
         sectionInfo.classList.remove('hidden');
         sectionInfo.classList.add('active');
         document.getElementById('step-nav-1').innerText = "1. Modus";
-        updateAssetInputsVisibility(true);
+        
+        if(simpleEstateWrapper) simpleEstateWrapper.style.display = 'none';
+        
+        // Scheidung: Braucht zwingend Eigentümer UND Typ
+        showAssetInputs(true, true);
     } else {
         sectionFamilie.style.display = 'block';
         sectionInfo.style.display = 'none';
         sectionInfo.classList.remove('active');
         document.getElementById('step-nav-1').innerText = "1. Familie";
-        // Check Spouse nur unter Lebenden
-        const hasSpouse = familienMitglieder.some(p => p.beziehung === 'Ehepartner' && p.status === 'lebend');
-        updateAssetInputsVisibility(hasSpouse);
+        
+        if(simpleEstateWrapper) simpleEstateWrapper.style.display = 'block';
+        
+        // Todesfall Check
+        checkAssetDetailsRequirements();
     }
 }
 
@@ -41,16 +48,49 @@ function forceNextStep() {
     document.getElementById('vermoegen').classList.add('active');
 }
 
-function updateAssetInputsVisibility(needsDetails) {
-    const detailsContainer = document.getElementById('asset-details-container');
+// Steuerung der Sichtbarkeit (Owner / Type)
+function showAssetInputs(showOwner, showType) {
+    const ownerContainer = document.getElementById('container-owner');
+    const typeContainer = document.getElementById('container-type');
     const subtitle = document.getElementById('asset-subtitle');
-    if (needsDetails) {
-        detailsContainer.style.display = 'block';
-        subtitle.innerText = "Erfassen Sie Eigentümer und Art (für Güterrecht nötig).";
+
+    ownerContainer.style.display = showOwner ? 'block' : 'none';
+    typeContainer.style.display = showType ? 'block' : 'none';
+
+    if (!showOwner && !showType) {
+        subtitle.innerText = "Alles fliesst in die Erbmasse.";
+    } else if (!showOwner && showType) {
+        subtitle.innerText = "Erfassen Sie Vermögen des Verstorbenen (Güterstand relevant).";
     } else {
-        detailsContainer.style.display = 'none';
-        subtitle.innerText = "Alles Vermögen gehört zum Nachlass.";
+        subtitle.innerText = "Erfassen Sie Eigentümer und Art.";
     }
+}
+
+function checkAssetDetailsRequirements() {
+    const simpleCheckbox = document.getElementById('simple-estate-checkbox');
+    const hasSpouse = familienMitglieder.some(p => p.beziehung === 'Ehepartner' && p.status === 'lebend');
+    
+    // Fall 1: "Reine Erbmasse" angehakt -> Nichts anzeigen (wird alles Erbmasse)
+    if (simpleCheckbox && simpleCheckbox.checked) {
+        showAssetInputs(false, false);
+        return;
+    }
+
+    // Fall 2: Kein Ehepartner (und nicht Scheidung) -> Alles gehört Erblasser, Güterstand egal
+    if (!hasSpouse && currentScenario === 'tod') {
+        showAssetInputs(false, false);
+        return;
+    }
+
+    // Fall 3: Ehepartner vorhanden im Todesfall -> Owner implizit, Typ anzeigen
+    if (hasSpouse && currentScenario === 'tod') {
+        showAssetInputs(false, true); // Owner AUS, Typ EIN
+        return;
+    }
+}
+
+function toggleAssetDetails() {
+    checkAssetDetailsRequirements();
 }
 
 function unlockStep(stepId) {
@@ -74,23 +114,18 @@ const completeFamilieBtn = document.getElementById('complete-familie');
 const noFamilyCheckbox = document.getElementById('no-family-checkbox');
 const familyInputsDiv = document.getElementById('family-inputs');
 
-// NEU: Logik für die Checkbox "Keine Verwandten"
 noFamilyCheckbox.addEventListener('change', (e) => {
     if (e.target.checked) {
-        // Alles leeren und sperren
         familienMitglieder = [];
         renderFamilienListe();
         familyInputsDiv.style.opacity = '0.5';
         familyInputsDiv.style.pointerEvents = 'none';
-        completeFamilieBtn.disabled = false; // Weiter erlauben!
-        
-        // UI-Update für Vermögen (auf "Ledig" setzen)
-        updateAssetInputsVisibility(false);
+        completeFamilieBtn.disabled = false;
+        checkAssetDetailsRequirements();
     } else {
-        // Wieder entsperren
         familyInputsDiv.style.opacity = '1';
         familyInputsDiv.style.pointerEvents = 'auto';
-        renderFamilienListe(); // Prüft ob Button disabled sein muss
+        renderFamilienListe();
     }
 });
 
@@ -104,9 +139,7 @@ function toggleStammInput() {
 function renderFamilienListe() {
     familienListe.innerHTML = '';
     
-    // Leerer Zustand
     if (familienMitglieder.length === 0) {
-        // Spezialfall: Checkbox aktiviert?
         if (noFamilyCheckbox.checked) {
             familienListe.classList.remove('empty-state');
             familienListe.innerHTML = '<div style="padding:10px; color:#e67e22; font-weight:bold;">Der Staat erbt (Keine Verwandten).</div>';
@@ -116,14 +149,14 @@ function renderFamilienListe() {
             familienListe.innerHTML = '<span class="placeholder-text">Keine Personen</span>';
             completeFamilieBtn.disabled = true;
         }
+        if(currentScenario === 'tod') checkAssetDetailsRequirements();
         return;
     }
 
     familienListe.classList.remove('empty-state');
     completeFamilieBtn.disabled = false;
 
-    const hasSpouse = familienMitglieder.some(p => p.beziehung === 'Ehepartner' && p.status === 'lebend');
-    if(currentScenario === 'tod') updateAssetInputsVisibility(hasSpouse);
+    if(currentScenario === 'tod') checkAssetDetailsRequirements();
 
     familienMitglieder.forEach((person, index) => {
         const item = document.createElement('div');
@@ -137,10 +170,7 @@ function renderFamilienListe() {
             info += `<br><small style="color:#7f8c8d; margin-left:25px;">↳ Kind von: ${person.stamm}</small>`;
         }
 
-        item.innerHTML = `
-            <div>${info}</div>
-            <button onclick="removeFamily(${index})" style="color:red;border:none;background:none;cursor:pointer;">&times;</button>
-        `;
+        item.innerHTML = `<div>${info}</div><button onclick="removeFamily(${index})" style="color:red;border:none;background:none;cursor:pointer;">&times;</button>`;
         familienListe.appendChild(item);
     });
 }
@@ -150,6 +180,7 @@ function removeFamily(index) {
     renderFamilienListe();
 }
 
+// Hinzufügen von Familienmitgliedern mit Validierung
 document.querySelector('#familie .add-button').addEventListener('click', () => {
     const name = nameInput.value.trim();
     const beziehung = beziehungSelect.value;
@@ -158,6 +189,13 @@ document.querySelector('#familie .add-button').addEventListener('click', () => {
 
     if (!name || !beziehung) return alert("Bitte Name und Beziehung angeben");
     
+    // VALIDIERUNG: Duplikate verhindern
+    // Wir prüfen case-insensitive (Anna == anna)
+    const exists = familienMitglieder.some(p => p.name.toLowerCase() === name.toLowerCase());
+    if (exists) {
+        return alert("Dieser Name existiert bereits. Bitte verwenden Sie eindeutige Namen (z.B. 'Anna B.').");
+    }
+
     if (beziehung === 'Ehepartner' && familienMitglieder.some(p => p.beziehung === 'Ehepartner')) {
         return alert("Es gibt nur einen Ehepartner.");
     }
@@ -194,6 +232,7 @@ const vermoegenWert = document.getElementById('vermoegen-wert');
 const vermoegenBesitzer = document.getElementById('vermoegen-besitzer');
 const vermoegenTyp = document.getElementById('vermoegen-typ');
 const completeAssetBtn = document.getElementById('complete-vermoegen');
+const simpleEstateCheckbox = document.getElementById('simple-estate-checkbox');
 
 function renderVermoegen() {
     vermoegenListe.innerHTML = '';
@@ -206,7 +245,9 @@ function renderVermoegen() {
     completeAssetBtn.disabled = false;
     vermoegenListe.classList.remove('empty-state');
 
-    const detailsVisible = document.getElementById('asset-details-container').style.display !== 'none';
+    const ownerVisible = document.getElementById('container-owner').style.display !== 'none';
+    const typeVisible = document.getElementById('container-type').style.display !== 'none';
+
     let sum = 0;
 
     vermoegenswerte.forEach((v, index) => {
@@ -214,10 +255,16 @@ function renderVermoegen() {
         const item = document.createElement('div');
         item.className = 'liste-item';
         let subText = "";
-        if (detailsVisible) {
+        
+        if (!ownerVisible && !typeVisible) {
+            subText = `<br><small style="color:#27ae60">Reine Erbmasse</small>`;
+        } else if (!ownerVisible && typeVisible) {
+            subText = `<br><small>Erblasser | ${v.typ}</small>`;
+        } else {
             let ownerLabel = v.besitzer === 'A' ? (currentScenario === 'tod' ? 'Erblasser' : 'Partner A') : (currentScenario === 'tod' ? 'Ehepartner' : 'Partner B');
             subText = `<br><small>${ownerLabel} | ${v.typ}</small>`;
         }
+
         item.innerHTML = `<div><b>${v.art}</b>${subText}</div><div style="display:flex;gap:10px;"><b>${formatCHF(v.wert)}</b><button onclick="removeAsset(${index})" style="color:red;border:none;background:none;cursor:pointer;">&times;</button></div>`;
         vermoegenListe.appendChild(item);
     });
@@ -225,15 +272,43 @@ function renderVermoegen() {
 }
 function removeAsset(i){ vermoegenswerte.splice(i,1); renderVermoegen(); }
 
+// Hinzufügen von Vermögen mit Validierung
 addAssetBtn.addEventListener('click', () => {
-    const art = vermoegenArt.value;
-    const wert = parseFloat(vermoegenWert.value);
-    if (!art || isNaN(wert)) return alert("Bitte Wert eingeben");
-    const detailsVisible = document.getElementById('asset-details-container').style.display !== 'none';
-    vermoegenswerte.push({art, wert, besitzer: detailsVisible ? vermoegenBesitzer.value : 'A', typ: detailsVisible ? vermoegenTyp.value : 'Eigengut' });
+    const art = vermoegenArt.value.trim();
+    const wertStr = vermoegenWert.value; // Als String holen
+    const wert = parseFloat(wertStr);
+
+    if (!art) {
+        return alert("Bitte geben Sie eine Bezeichnung ein.");
+    }
+
+    // VALIDIERUNG: Zahlen
+    if (isNaN(wert)) {
+        return alert("Bitte geben Sie eine gültige Zahl für den Wert ein (keine Buchstaben).");
+    }
+    
+    if (wert < 0) {
+        return alert("Der Wert darf nicht negativ sein.");
+    }
+    
+    const ownerVisible = document.getElementById('container-owner').style.display !== 'none';
+    const typeVisible = document.getElementById('container-type').style.display !== 'none';
+
+    let besitzer = 'A'; // Default Erblasser
+    let typ = 'Eigengut'; // Default für reine Erbmasse
+
+    if (ownerVisible) {
+        besitzer = vermoegenBesitzer.value;
+    }
+    if (typeVisible) {
+        typ = vermoegenTyp.value;
+    }
+
+    vermoegenswerte.push({art, wert, besitzer, typ});
     renderVermoegen();
     vermoegenArt.value=''; vermoegenWert.value='';
 });
+
 completeAssetBtn.addEventListener('click', () => {
     document.getElementById('vermoegen').classList.remove('active');
     unlockStep('ergebnis');
@@ -247,7 +322,6 @@ function calculateResult() {
     const container = document.getElementById('ergebnis-content');
     container.innerHTML = '';
 
-    // 1. GÜTERRECHT: Summen bilden
     let a_eigengut = 0, a_err = 0, b_eigengut = 0, b_err = 0;
     vermoegenswerte.forEach(v => {
         if (v.besitzer === 'A') v.typ === 'Eigengut' ? a_eigengut += v.wert : a_err += v.wert;
@@ -264,7 +338,7 @@ function calculateResult() {
         container.innerHTML = `
             <div style="text-align:center;margin-bottom:20px;">
                 <h3 style="color:#e67e22">Scheidungsergebnis</h3>
-                <p>Güterrechtliche Teilung (Errungenschaftsbeteiligung)</p>
+                <p>Güterrechtliche Teilung</p>
             </div>
             <div class="split-view">
                 <div class="result-card">
@@ -285,7 +359,7 @@ function calculateResult() {
         return;
     }
 
-    // --- FALL 2: TODESFALL ---
+    // --- TODESFALL ---
     const livingSpouse = familienMitglieder.find(p => p.beziehung === 'Ehepartner' && p.status === 'lebend');
     let spouseGueterrecht = 0;
     let erbmasse = 0;
@@ -299,17 +373,18 @@ function calculateResult() {
 
     let html = `
         <div style="margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px;">
-            <h3>1. Güterrecht</h3>
-            ${livingSpouse ? `<p>Vorabzug Partner: <b>${formatCHF(spouseGueterrecht)}</b></p>` : ''}
+            ${spouseGueterrecht > 0 ? 
+                `<h3>1. Güterrecht (Vorabzug)</h3>
+                 <p>Partner erhält vorab: <b>${formatCHF(spouseGueterrecht)}</b></p>` : ''
+            }
             <div style="background:#eaf2f8; padding:10px; border-radius:5px; margin-top:10px;">
-                <strong>Erbmasse: ${formatCHF(erbmasse)}</strong>
+                <strong>Zu verteilende Erbmasse: ${formatCHF(erbmasse)}</strong>
             </div>
         </div>
         <h3>2. Erbteilung</h3>`;
 
     let shares = [];
 
-    // --- VERTEILUNGSLOGIK ---
     const distributeByStamm = (heirs, totalAmount, rootType) => {
         let potentialStemNames = new Set();
         heirs.forEach(h => {
@@ -381,7 +456,7 @@ function calculateResult() {
                 if (siblingsAndNieces.some(p => p.status === 'lebend')) {
                     distributeByStamm(siblingsAndNieces, hälfteFürSeite, 'Geschwister');
                 } else {
-                    shares.push({ name: "Andere Seite / Staat", wert: 0, note: "Stammseite leer" });
+                    shares.push({ name: "Staat / Andere Seite", wert: 0, note: "Stammseite leer" });
                 }
             }
         });
@@ -399,12 +474,7 @@ function calculateResult() {
         if (livingSpouse) {
              shares.push({ name: livingSpouse.name, wert: erbmasse, note: "Alleinerbe" });
         } else {
-             // Fallback: Staat
-             shares.push({ 
-                 name: "Kanton / Gemeinde", 
-                 wert: erbmasse, 
-                 note: "Keine erbberechtigten Verwandten (Art. 466 ZGB)" 
-             });
+             shares.push({ name: "Kanton / Gemeinde", wert: erbmasse, note: "Keine erbberechtigten Verwandten" });
         }
     }
 
