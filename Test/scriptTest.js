@@ -1,42 +1,38 @@
-/**
- * Unit Tests for Swiss Inheritance Calculator (script.js)
- * Simple, focused tests for testable functions
- */
-
 const { formatCHF, deleteAssetByType, removeAsset, resetVermoegenswerte, getVermoegenswerte } = require('../script.js');
 
-describe('Swiss Inheritance Calculator - Unit Tests', () => {
+describe('ERBO - Scheidungsfälle und Erbrechner', () => {
 
-    // ========== formatCHF Tests ==========
+    // formatCHF Tests
     describe('formatCHF - Currency Formatting', () => {
         
+        // Test 1 - Given input of 100'000, format to 100'000 CHF 
         test('Format 100000 as CHF currency', () => {
             const result = formatCHF(100000);
             expect(result).toContain('CHF');
             expect(result).toContain('100');
         });
-
+        // Test 2 - Given input of 50'000, format to 50'000 CHF 
         test('Format 50000 as CHF currency', () => {
             const result = formatCHF(50000);
             expect(result).toContain('CHF');
             expect(result).toContain('50');
         });
-
+        // Test 3 - Given input of 0, format to 0 CHF
         test('Format 0 as CHF currency', () => {
             const result = formatCHF(0);
             expect(result).toContain('CHF');
             expect(result).toContain('0');
         });
-
+        // Test 4 - Given number with decimals, format using ’ and .
         test('Format decimal amount correctly', () => {
             const result = formatCHF(1234.56);
             expect(result).toContain('CHF');
-            expect(result).toContain('1');
+            expect(result).toContain("1’234.56");
         });
 
     });
 
-    // ========== deleteAssetByType Tests ==========
+    // deleteAssetByType Tests
     describe('deleteAssetByType - Asset Deletion', () => {
         
         beforeEach(() => {
@@ -48,6 +44,7 @@ describe('Swiss Inheritance Calculator - Unit Tests', () => {
             ]);
         });
 
+        // Test 5 - Given asset 'Auto', delete first occurrence only
         test('Delete first occurrence of an asset type', () => {
             deleteAssetByType('Auto', false);
             const result = getVermoegenswerte();
@@ -55,6 +52,7 @@ describe('Swiss Inheritance Calculator - Unit Tests', () => {
             expect(result.some(a => a.art === 'Auto')).toBe(false);
         });
 
+        // Test 6 - Given lowercase 'auto', delete 'Auto' (case-insensitive)
         test('Delete asset with case-insensitive matching', () => {
             deleteAssetByType('auto', false);
             const result = getVermoegenswerte();
@@ -62,12 +60,14 @@ describe('Swiss Inheritance Calculator - Unit Tests', () => {
             expect(result.some(a => a.art === 'Auto')).toBe(false);
         });
 
+        // Test 7 - Given non-existent asset 'Flugzeug', array remains unchanged
         test('Do nothing if asset type does not exist', () => {
             const initialLength = getVermoegenswerte().length;
             deleteAssetByType('Flugzeug', false);
             expect(getVermoegenswerte().length).toBe(initialLength);
         });
 
+        // Test 8 - Given multiple 'Auto' assets and all=true, delete all occurrences
         test('Delete all occurrences when all=true', () => {
             const current = getVermoegenswerte();
             current.push({ art: 'Auto', wert: 30000 });
@@ -77,7 +77,7 @@ describe('Swiss Inheritance Calculator - Unit Tests', () => {
 
     });
 
-    // ========== removeAsset Tests ==========
+    // removeAsset Tests
     describe('removeAsset - Remove by Index', () => {
         
         beforeEach(() => {
@@ -89,6 +89,7 @@ describe('Swiss Inheritance Calculator - Unit Tests', () => {
             ]);
         });
 
+        // Test 9 - Given index 0, remove first asset from array
         test('Remove asset at index 0', () => {
             removeAsset(0);
             const result = getVermoegenswerte();
@@ -96,6 +97,7 @@ describe('Swiss Inheritance Calculator - Unit Tests', () => {
             expect(result[0].art).toBe('Auto');
         });
 
+        // Test 10 - Given index 1, remove second asset from array
         test('Remove asset at index 1', () => {
             removeAsset(1);
             const result = getVermoegenswerte();
@@ -103,48 +105,18 @@ describe('Swiss Inheritance Calculator - Unit Tests', () => {
             expect(result.some(a => a.art === 'Auto')).toBe(false);
         });
 
+        // Test 11 - Given negative index -1, array remains unchanged
         test('Do nothing if index is out of bounds (negative)', () => {
             const initialLength = getVermoegenswerte().length;
             removeAsset(-1);
             expect(getVermoegenswerte().length).toBe(initialLength);
         });
 
+        // Test 12 - Given out of bounds, array remains unchanged
         test('Do nothing if index is out of bounds (too high)', () => {
             const initialLength = getVermoegenswerte().length;
             removeAsset(999);
             expect(getVermoegenswerte().length).toBe(initialLength);
         });
-
     });
-
-    // ========== Input Validation Tests ==========
-    describe('Input Validation', () => {
-        
-        test('Reject empty name input', () => {
-            const name = '';
-            expect(name.trim()).toBe('');
-        });
-
-        test('Reject negative asset value', () => {
-            const value = -50000;
-            expect(value > 0).toBe(false);
-        });
-
-        test('Reject zero asset value', () => {
-            const value = 0;
-            expect(value > 0).toBe(false);
-        });
-
-        test('Accept positive asset value', () => {
-            const value = 50000;
-            expect(value > 0).toBe(true);
-        });
-
-        test('Accept non-empty name after trim', () => {
-            const name = '  Haus  ';
-            expect(name.trim().length).toBeGreaterThan(0);
-        });
-
-    });
-
 });
