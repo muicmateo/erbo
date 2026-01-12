@@ -269,6 +269,7 @@ function renderVermoegen() {
     });
     vermoegenListe.prepend(Object.assign(document.createElement('div'), {className:'asset-total', innerHTML:`Total: ${formatCHF(sum)}`}));
 }
+window.renderVermoegen = renderVermoegen;
 
 addAssetBtn.addEventListener('click', () => {
     const art = vermoegenArt.value;
