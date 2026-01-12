@@ -32,18 +32,19 @@ const sections = {
     ergebnis: document.getElementById('ergebnis')
 };
 
-// Helper to format currency
-const formatCHF = (value) => {
 let currentScenario = 'tod'; 
 
-// ========== HELPER ==========
-function formatCHF(value) {
-    return new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(value);
-}
+// Set up scenario toggle listeners
+document.getElementById('opt-tod').addEventListener('click', () => switchScenario('tod'));
+document.getElementById('opt-scheidung').addEventListener('click', () => switchScenario('scheidung'));
 
 // ========== SZENARIO LOGIK ==========
 function switchScenario(szenario) {
     currentScenario = szenario;
+    // Update radio button states
+    document.querySelector('input[value="tod"]').checked = (szenario === 'tod');
+    document.querySelector('input[value="scheidung"]').checked = (szenario === 'scheidung');
+    // Update visual selection
     document.getElementById('opt-tod').classList.toggle('selected', szenario === 'tod');
     document.getElementById('opt-scheidung').classList.toggle('selected', szenario === 'scheidung');
 
@@ -67,12 +68,16 @@ function switchScenario(szenario) {
         updateAssetInputsVisibility(hasSpouse);
     }
 }
+window.switchScenario = switchScenario;
 
 function forceNextStep() {
-    document.getElementById('scheidung-info').classList.remove('active');
+    const scheidungInfo = document.getElementById('scheidung-info');
+    scheidungInfo.classList.remove('active');
+    scheidungInfo.style.display = 'none';
     unlockStep('vermoegen');
     document.getElementById('vermoegen').classList.add('active');
 }
+window.forceNextStep = forceNextStep;
 
 function updateAssetInputsVisibility(needsDetails) {
     const detailsContainer = document.getElementById('asset-details-container');
@@ -89,9 +94,15 @@ function updateAssetInputsVisibility(needsDetails) {
 function unlockStep(stepId) {
     const section = document.getElementById(stepId);
     const indicator = document.querySelector(`.step[data-step="${stepId}"]`);
+    if (!section) {
+        console.error('Could not find section:', stepId);
+        return;
+    }
     section.classList.remove('locked');
     const overlay = section.querySelector('.blur-overlay');
     if (overlay) overlay.remove();
+    
+    // Update step indicators
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     if (indicator) indicator.classList.add('active');
 }
@@ -133,6 +144,7 @@ function toggleStammInput() {
     if (needsStamm) stammGroup.classList.remove('hidden');
     else stammGroup.classList.add('hidden');
 }
+window.toggleStammInput = toggleStammInput;
 
 function renderFamilienListe() {
     familienListe.innerHTML = '';
@@ -182,6 +194,7 @@ function removeFamily(index) {
     familienMitglieder.splice(index, 1);
     renderFamilienListe();
 }
+window.removeFamily = removeFamily;
 
 document.querySelector('#familie .add-button').addEventListener('click', () => {
     const name = nameInput.value.trim();
@@ -256,7 +269,6 @@ function renderVermoegen() {
     });
     vermoegenListe.prepend(Object.assign(document.createElement('div'), {className:'asset-total', innerHTML:`Total: ${formatCHF(sum)}`}));
 }
-function removeAsset(i){ vermoegenswerte.splice(i,1); renderVermoegen(); }
 
 addAssetBtn.addEventListener('click', () => {
     const art = vermoegenArt.value;
@@ -287,11 +299,13 @@ radioButtons.forEach(radio => {
 });
 
 completeBerechnung.addEventListener('click', () => {
-    generateErgebnis();
-    unlockNextSection('berechnung', 'ergebnis');
+    calculateResult();
+    unlockStep('ergebnis');
+    document.getElementById('ergebnis').classList.add('active');
 });
 
-// ========== DUPLICATE FUNCTIONS REMOVED - SEE END OF FILE ==========
+// ========== SCHRITT 3: BERECHNUNG / RESULT ==========
+function calculateResult() {
     const container = document.getElementById('ergebnis-content');
     container.innerHTML = '';
 
