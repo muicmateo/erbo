@@ -240,7 +240,7 @@ button {
   font-style: italic;
 }
 
-.liste-item {
+.list-item {
   background: white;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
@@ -316,7 +316,7 @@ button {
   color: var(--success);
 }
 
-/* Szenario Switcher Styles */
+/* Scenario Switcher Styles */
 .scenario-selector-container {
     display: flex;
     justify-content: center;
@@ -360,7 +360,7 @@ button {
     color: var(--primary);
 }
 
-/* Scheidung Spezialfarbe */
+/* Divorce Special Color */
 .scenario-option:last-child.selected {
     border-color: #e67e22;
     background-color: #fdf2e9;

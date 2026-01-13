@@ -16,29 +16,29 @@
             </div>
             
             <div class="scenario-selector-container">
-                <label class="scenario-option selected" id="opt-tod">
-                    <input type="radio" name="szenario" value="tod" checked onchange="switchScenario('tod')">
+                <label class="scenario-option selected" id="opt-death">
+                    <input type="radio" name="scenario" value="death" checked onchange="switchScenario('death')">
                     <span class="icon">✝️</span>
                     <span class="text">Todesfall (Erbe)</span>
                 </label>
-                <label class="scenario-option" id="opt-scheidung">
-                    <input type="radio" name="szenario" value="scheidung" onchange="switchScenario('scheidung')">
+                <label class="scenario-option" id="opt-divorce">
+                    <input type="radio" name="scenario" value="divorce" onchange="switchScenario('divorce')">
                     <span class="icon">💔</span>
                     <span class="text">Scheidung</span>
                 </label>
             </div>
 
             <div class="step-indicator">
-                <div class="step active" id="step-nav-1" data-step="familie">1. Familie</div>
+                <div class="step active" id="step-nav-1" data-step="family">1. Familie</div>
                 <div class="line"></div>
-                <div class="step" id="step-nav-2" data-step="vermoegen">2. Vermögen</div>
+                <div class="step" id="step-nav-2" data-step="assets">2. Vermögen</div>
                 <div class="line"></div>
-                <div class="step" id="step-nav-3" data-step="ergebnis">3. Ergebnis</div>
+                <div class="step" id="step-nav-3" data-step="result">3. Ergebnis</div>
             </div>
         </header>
 
         <main class="main-content">
-            <section id="familie" class="card active">
+            <section id="family" class="card active">
                 <div class="card-header">
                     <h2>Familienkonstellation</h2>
                     <p class="subtitle">Erfassen Sie alle relevanten Personen.</p>
@@ -54,32 +54,32 @@
                             
                             <div class="form-group">
                                 <label>Beziehung zum Erblasser</label>
-                                <select id="beziehung-select" class="dropdown-select" onchange="toggleStammInput()">
+                                <select id="relationship-select" class="dropdown-select" onchange="toggleParentInput()">
                                     <option value="" disabled selected>Bitte wählen...</option>
-                                    <option value="Ehepartner">Ehepartner</option>
-                                    <option value="Kind">Kind (Sohn/Tochter)</option>
-                                    <option value="Enkel">Enkel / Enkelin</option>
-                                    <option value="Urenkel">Urenkel / Urenkelin</option>
-                                    <option value="Elternteil">Elternteil</option>
-                                    <option value="Geschwister">Geschwister</option>
-                                    <option value="NichteNeffe">Nichte / Neffe</option>
-                                    <option value="Grosseltern">Grosseltern</option>
-                                    <option value="OnkelTante">Onkel / Tante</option>
-                                    <option value="Cousin">Cousin / Cousine</option>
+                                    <option value="spouse">Ehepartner</option>
+                                    <option value="child">Kind (Sohn/Tochter)</option>
+                                    <option value="grandchild">Enkel / Enkelin</option>
+                                    <option value="greatGrandchild">Urenkel / Urenkelin</option>
+                                    <option value="parent">Elternteil</option>
+                                    <option value="sibling">Geschwister</option>
+                                    <option value="nieceNephew">Nichte / Neffe</option>
+                                    <option value="grandparent">Grosseltern</option>
+                                    <option value="uncleAunt">Onkel / Tante</option>
+                                    <option value="cousin">Cousin / Cousine</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label>Status</label>
                                 <select id="status-select" class="dropdown-select">
-                                    <option value="lebend" selected>Lebend</option>
-                                    <option value="verstorben">Bereits verstorben</option>
+                                    <option value="alive" selected>Lebend</option>
+                                    <option value="deceased">Bereits verstorben</option>
                                 </select>
                             </div>
 
-                            <div class="form-group hidden" id="stamm-group">
+                            <div class="form-group hidden" id="parent-group">
                                 <label>Kind von wem? (Elternteil)</label>
-                                <input type="text" id="stamm-input" placeholder="Name des Elternteils">
+                                <select id="parent-input" class="dropdown-select"></select>
                             </div>
 
                             <button class="btn-primary add-button">Hinzufügen</button>
@@ -96,28 +96,25 @@
 
                     <div class="display-panel">
                         <div class="panel-header">Verwandte</div>
-                        <div id="familien-liste" class="list-container empty-state">
+                        <div id="family-list" class="list-container empty-state">
                             <span class="placeholder-text">Keine Personen</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="card-footer">
-                    <button id="complete-familie" class="btn-next" disabled>Weiter zu Vermögen</button>
+                    <button id="complete-family" class="btn-next" disabled>Weiter zu Vermögen</button>
                 </div>
             </section>
 
-            <section id="scheidung-info" class="card hidden">
+            <section id="divorce-info" class="card hidden">
                 <div class="card-body" style="text-align:center; padding: 2rem;">
                     <h3 style="color: #e67e22;">Modus: Scheidung</h3>
                     <p style="color: #7f8c8d;">Familiendaten sind hier nicht nötig.</p>
-                    <div style="margin-top:20px;">
-                        <button class="btn-next" onclick="forceNextStep()">Direkt zur Vermögensaufteilung</button>
-                    </div>
                 </div>
             </section>
 
-            <section id="vermoegen" class="card locked">
+            <section id="assets" class="card locked">
                 <div class="blur-overlay"><div class="lock-message">🔒 Zuerst Schritt 1 abschließen</div></div>
 
                 <div class="card-header">
@@ -140,26 +137,26 @@
 
                         <div class="form-group">
                             <label>Bezeichnung</label>
-                            <input type="text" id="vermoegen-art" placeholder="z.B. Konto, Haus">
+                            <input type="text" id="asset-name" placeholder="z.B. Konto, Haus">
                         </div>
                         <div class="form-group">
                             <label>Wert (CHF)</label>
-                            <input type="number" id="vermoegen-wert" placeholder="0.00">
+                            <input type="number" id="asset-value" placeholder="0.00">
                         </div>
                         
                         <div id="container-owner" class="form-group">
                             <label>Eigentümer</label>
-                            <select id="vermoegen-besitzer" class="dropdown-select">
-                                <option value="A">Partner A (Ich / Erblasser)</option>
+                            <select id="asset-owner" class="dropdown-select">
+                                <option value="A">Partner A (Ich)</option>
                                 <option value="B">Partner B (Ehepartner)</option>
                             </select>
                         </div>
 
                         <div id="container-type" class="form-group">
                             <label>Güterstand-Kategorie</label>
-                            <select id="vermoegen-typ" class="dropdown-select">
-                                <option value="Errungenschaft">Errungenschaft (Gemeinsam erwirtschaftet)</option>
-                                <option value="Eigengut">Eigengut (Eingebracht/Geerbt)</option>
+                            <select id="asset-category" class="dropdown-select">
+                                <option value="acquest">Errungenschaft (Gemeinsam erwirtschaftet)</option>
+                                <option value="individual">Eigengut (Eingebracht/Geerbt)</option>
                             </select>
                         </div>
 
@@ -168,21 +165,21 @@
 
                     <div class="display-panel">
                         <div class="panel-header">Liste der Werte</div>
-                        <div id="vermoegen-liste" class="list-container empty-state">
+                        <div id="asset-list" class="list-container empty-state">
                             <span class="placeholder-text">Leer</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="card-footer">
-                    <button id="complete-vermoegen" class="btn-next" disabled>Ergebnis anzeigen</button>
+                    <button id="complete-assets" class="btn-next" disabled>Ergebnis anzeigen</button>
                 </div>
             </section>
 
-            <section id="ergebnis" class="card locked">
+            <section id="result" class="card locked">
                 <div class="blur-overlay"><div class="lock-message">🔒</div></div>
                 <div class="card-header"><h2 id="result-title">Ergebnis</h2></div>
-                <div class="card-body"><div id="ergebnis-content" class="result-box"></div></div>
+                <div class="card-body"><div id="result-content" class="result-box"></div></div>
                 <div class="card-footer"><button class="btn-secondary" onclick="location.reload()">Neu starten</button></div>
             </section>
         </main>
