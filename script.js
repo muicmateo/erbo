@@ -430,7 +430,7 @@ function initializeApp() {
         smartScroll(null, true);
     });
 
-    // ========== STEP 3: CALCULATION & RESULT ==========
+    // ========== STEP 3: CALCULATION OF RESULT ==========
     function calculateResult() {
         const container = document.getElementById('result-content');
         container.innerHTML = '';
