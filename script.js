@@ -3,7 +3,6 @@ let familienMitglieder = [];
 let vermoegenswerte = [];
 let teilungGewaehlt = false;
 
-// Test helper functions to set state
 function resetVermoegenswerte(newArray = []) {
     vermoegenswerte = newArray;
 }
@@ -13,12 +12,10 @@ function resetFamilienMitglieder(newArray = []) {
 }
 
 
-// Helper to format currency
 const formatCHF = (value) => {
     return new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(value);
 };
 
-// Only initialize DOM-dependent code in browser environment
 if (typeof module === 'undefined' || !module.exports) {
     initializeApp();
 }
@@ -34,17 +31,17 @@ const sections = {
 
 let currentScenario = 'tod'; 
 
-// Set up scenario toggle listeners
+// Scenario toggle 
 document.getElementById('opt-tod').addEventListener('click', () => switchScenario('tod'));
 document.getElementById('opt-scheidung').addEventListener('click', () => switchScenario('scheidung'));
 
 // ========== SZENARIO LOGIK ==========
 function switchScenario(szenario) {
     currentScenario = szenario;
-    // Update radio button states
+
     document.querySelector('input[value="tod"]').checked = (szenario === 'tod');
     document.querySelector('input[value="scheidung"]').checked = (szenario === 'scheidung');
-    // Update visual selection
+
     document.getElementById('opt-tod').classList.toggle('selected', szenario === 'tod');
     document.getElementById('opt-scheidung').classList.toggle('selected', szenario === 'scheidung');
 
@@ -61,7 +58,7 @@ function switchScenario(szenario) {
         
         if(simpleEstateWrapper) simpleEstateWrapper.style.display = 'none';
         
-        // Scheidung: Braucht zwingend Eigentümer UND Typ
+        // Scheidung
         showAssetInputs(true, true);
     } else {
         sectionFamilie.style.display = 'block';
@@ -86,7 +83,7 @@ function forceNextStep() {
 }
 window.forceNextStep = forceNextStep;
 
-// Steuerung der Sichtbarkeit (Owner / Type)
+// Steuerung der Sichtbarkeit
 function showAssetInputs(showOwner, showType) {
     const ownerContainer = document.getElementById('container-owner');
     const typeContainer = document.getElementById('container-type');
@@ -108,13 +105,13 @@ function checkAssetDetailsRequirements() {
     const simpleCheckbox = document.getElementById('simple-estate-checkbox');
     const hasSpouse = familienMitglieder.some(p => p.beziehung === 'Ehepartner' && p.status === 'lebend');
     
-    // Fall 1: "Reine Erbmasse" angehakt -> Nichts anzeigen (wird alles Erbmasse)
+    // Fall 1: "Reine Erbmasse" angehakt -> Wir alles zur Erbmasse
     if (simpleCheckbox && simpleCheckbox.checked) {
         showAssetInputs(false, false);
         return;
     }
 
-    // Fall 2: Kein Ehepartner (und nicht Scheidung) -> Alles gehört Erblasser, Güterstand egal
+    // Fall 2: Kein Ehepartner -> Alles gehört dem Erblasser
     if (!hasSpouse && currentScenario === 'tod') {
         showAssetInputs(false, false);
         return;
@@ -122,7 +119,7 @@ function checkAssetDetailsRequirements() {
 
     // Fall 3: Ehepartner vorhanden im Todesfall -> Owner implizit, Typ anzeigen
     if (hasSpouse && currentScenario === 'tod') {
-        showAssetInputs(false, true); // Owner AUS, Typ EIN
+        showAssetInputs(false, true);
         return;
     }
 }
@@ -142,7 +139,7 @@ function unlockStep(stepId) {
     const overlay = section.querySelector('.blur-overlay');
     if (overlay) overlay.remove();
     
-    // Update step indicators
+
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     if (indicator) indicator.classList.add('active');
 }
@@ -235,8 +232,7 @@ document.querySelector('#familie .add-button').addEventListener('click', () => {
 
     if (!name || !beziehung) return alert("Bitte Name und Beziehung angeben");
     
-    // VALIDIERUNG: Duplikate verhindern
-    // Wir prüfen case-insensitive (Anna == anna)
+    // VALIDIERUNG (Keine doppelten Namen)
     const exists = familienMitglieder.some(p => p.name.toLowerCase() === name.toLowerCase());
     if (exists) {
         return alert("Dieser Name existiert bereits. Bitte verwenden Sie eindeutige Namen (z.B. 'Anna B.').");
@@ -321,14 +317,14 @@ window.renderVermoegen = renderVermoegen;
 // Hinzufügen von Vermögen mit Validierung
 addAssetBtn.addEventListener('click', () => {
     const art = vermoegenArt.value.trim();
-    const wertStr = vermoegenWert.value; // Als String holen
+    const wertStr = vermoegenWert.value;
     const wert = parseFloat(wertStr);
 
     if (!art) {
         return alert("Bitte geben Sie eine Bezeichnung ein.");
     }
 
-    // VALIDIERUNG: Zahlen
+    // VALIDIERUNG: Zahlen keine Buchstaben
     if (isNaN(wert)) {
         return alert("Bitte geben Sie eine gültige Zahl für den Wert ein (keine Buchstaben).");
     }
@@ -340,8 +336,8 @@ addAssetBtn.addEventListener('click', () => {
     const ownerVisible = document.getElementById('container-owner').style.display !== 'none';
     const typeVisible = document.getElementById('container-type').style.display !== 'none';
 
-    let besitzer = 'A'; // Default Erblasser
-    let typ = 'Eigengut'; // Default für reine Erbmasse
+    let besitzer = 'A';
+    let typ = 'Eigengut';
 
     if (ownerVisible) {
         besitzer = vermoegenBesitzer.value;
@@ -380,7 +376,7 @@ completeBerechnung.addEventListener('click', () => {
     document.getElementById('ergebnis').classList.add('active');
 });
 
-// ========== SCHRITT 3: BERECHNUNG / RESULT ==========
+// ========== SCHRITT 3: BERECHNUNG RESULTAT ==========
 function calculateResult() {
     const container = document.getElementById('ergebnis-content');
     container.innerHTML = '';
@@ -552,13 +548,13 @@ function calculateResult() {
     container.innerHTML = html;
 }
 
-} // End of initializeApp()
+}
 
-// Helper functions for testing
+
 function removeAsset(i) {
     if (i < 0 || i >= vermoegenswerte.length) return;
     vermoegenswerte.splice(i, 1);
-    // Only call DOM function if in browser
+
     if (typeof renderVermoegen !== 'undefined') renderVermoegen();
 }
 
@@ -571,11 +567,10 @@ function deleteAssetByType(type, all = false) {
         const idx = vermoegenswerte.findIndex(v => v.art.trim().toLowerCase() === needle);
         if (idx !== -1) vermoegenswerte.splice(idx, 1);
     }
-    // Only call DOM function if in browser
+
     if (typeof renderVermoegen !== 'undefined') renderVermoegen();
 }
 
-// Export functions for testing (Node.js environment)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         formatCHF,
