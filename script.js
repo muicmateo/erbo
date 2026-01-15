@@ -67,7 +67,7 @@ function initializeApp() {
             const overlay = document.createElement('div');
             overlay.className = 'blur-overlay';
             
-            let msg = "🔒 Zuerst vorherigen Schritt abschließen";
+            let msg = "🔒 Zuerst vorherigen Schritt abschliessen";
             if (stepId === 'result') msg = "🔒";
             
             overlay.innerHTML = `<div class="lock-message">${msg}</div>`;
