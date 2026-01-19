@@ -130,16 +130,6 @@ Die Berechnungen basieren auf:
 
 > ⚠️ **Hinweis**: Diese Anwendung dient nur zu Informationszwecken.  Für verbindliche Rechtsberatung konsultieren Sie bitte einen Fachanwalt oder Notar.
 
-## 🤝 Beitragen
-
-Beiträge sind willkommen!  Wenn du Verbesserungen vorschlagen möchtest: 
-
-1. Fork das Projekt
-2. Erstelle einen Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Committe deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
-4. Push zum Branch (`git push origin feature/AmazingFeature`)
-5. Öffne einen Pull Request
-
 ## 📄 Lizenz
 
 Dieses Projekt ist Open Source und frei verfügbar. 
