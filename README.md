@@ -144,12 +144,6 @@ Beiträge sind willkommen!  Wenn du Verbesserungen vorschlagen möchtest:
 
 Dieses Projekt ist Open Source und frei verfügbar. 
 
-## 👤 Autor
-
-**muicmateo**
-
-- GitHub: [@muicmateo](https://github.com/muicmateo)
-
 ## 🙏 Danksagungen
 
 - Schweizer Zivilgesetzbuch für die rechtlichen Grundlagen
