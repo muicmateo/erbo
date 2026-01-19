@@ -1,2 +1,2 @@
  ## IDPA-Hauptprojekt
-Erbe- und Rechts-Berechnungs Organisator
+Erbe- und Rechts-Berechnungs Oberfläche
